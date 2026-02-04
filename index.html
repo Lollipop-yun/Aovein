@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -22,9 +23,10 @@
             padding: 0;
         }
 
+        /* 解决 iOS 加载闪烁乱码的关键 */
         [v-cloak] { display: none !important; }
 
-        /* ==================== Aovein 加载页 ==================== */
+        /* ==================== Aovein 加载页 (白色) ==================== */
         #loading-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -66,7 +68,7 @@
             animation: progressFill 2.5s ease-in-out 0.8s forwards;
         }
 
-        /* ==================== 激活界面 ==================== */
+        /* ==================== 激活界面 (白色) ==================== */
         #activation-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -94,7 +96,7 @@
             margin-bottom: 30px;
             border: 1px solid #eee;
             text-align: center;
-            user-select: text !important; /* 允许复制设备码 */
+            user-select: text !important;
         }
         .device-label { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 4px; display: block; }
 
@@ -510,8 +512,18 @@ createApp({
             // Generate Code (Deterministic simulation based on ID for demo)
             const parts = did.split('-');
             const code = `${parts[0].split('').reverse().join('')}-${parts[1].split('').reverse().join('')}-${parts[2].split('').reverse().join('')}`;
-            console.log(`%c 🔑 [ADMIN] 当前设备激活码: ${code} `, 'background: #222; color: #bada55; font-size: 16px; padding: 10px;');
-            this.validCode = code;
+            // 混淆哈希算法
+            const clean = did.replace(/-/g, '').toUpperCase();
+            const map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
+            let res = '';
+            for(let i = 0; i < clean.length; i++) {
+                let code = clean.charCodeAt(i);
+                let mixed = (code * 7 + i * 13 + 99) % 36;
+                res += map[mixed];
+            }
+            const validCode = `${res.substring(0,3)}-${res.substring(3,7)}-${res.substring(7,11)}`;
+            console.log(`%c 🔑 [ADMIN] 当前设备激活码: ${validCode} `, 'background: #222; color: #bada55; font-size: 16px; padding: 10px;');
+            this.validCode = validCode;
         },
         attemptActivate() {
             const input = document.getElementById('activation-code');
@@ -759,8 +771,8 @@ createApp({
         editCustomWidget(i, f) { let t = f==='bubble'?'气泡文字':'下方文字'; this.showInput(t, this.customWidgets[i][f], "", (v) => { if(v){ this.customWidgets[i][f]=v; this.saveData(); } }); },
         triggerWidgetImageUpload(i) { this.editingWidgetId=i; if(this.$refs.widgetImageInput)this.$refs.widgetImageInput.click(); },
         async handleWidgetImageChange(e) { const f=e.target.files[0]; if(!f)return; try { this.customWidgets[this.editingWidgetId].image = await compressImage(f); this.saveData(); } catch(e){} },
-        saveData() { try { localStorage.setItem('onyunx_hybrid_v27', JSON.stringify(this.$data)); } catch(e){} },
-        loadData() { const s=localStorage.getItem('onyunx_hybrid_v27'); if(s) { try { const d=JSON.parse(s); Object.assign(this.$data, d); } catch(e){} } },
+        saveData() { try { localStorage.setItem('onyunx_hybrid_v28', JSON.stringify(this.$data)); } catch(e){} },
+        loadData() { const s=localStorage.getItem('onyunx_hybrid_v28'); if(s) { try { const d=JSON.parse(s); Object.assign(this.$data, d); } catch(e){} } },
         showToast(m) { this.toast.message=m; this.toast.show=true; setTimeout(()=>{this.toast.show=false},2000); },
         showInput(t,v,p,cb) { this.inputModal={show:true,title:t,value:v,placeholder:p,callback:cb,desc:''}; },
         showConfirm(m, cb) { this.confirmModal={show:true, message:m, callback:cb}; },
