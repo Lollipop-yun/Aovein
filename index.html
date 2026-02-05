@@ -1,14 +1,25 @@
-```
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="https://pic1.imgdb.cn/item/6984b274013471eb7b52c3d7.jpg">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-```
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aovein OS - Ultimate Pro Max</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Aovein</title>
+    
+    <!-- ========== PWA 核心配置 ========== -->
+    <!-- 引入 Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <!-- 浏览器主题色 -->
+    <meta name="theme-color" content="#000000">
+    
+    <!-- iOS 专用全屏配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Aovein">
+    <!-- iOS 图标 -->
+    <link rel="apple-touch-icon" href="https://pic1.imgdb.cn/item/6984b274013471eb7b52c3d7.jpg">
+    <!-- ================================ -->
+
     <!-- 依赖库 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -23,12 +34,16 @@
             -webkit-tap-highlight-color: transparent; 
             user-select: none; 
             overflow: hidden; 
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
+            /* 防止 iOS 橡皮筋效果 */
+            overscroll-behavior: none;
         }
 
+        /* 解决 iOS 加载闪烁乱码的关键 */
         [v-cloak] { display: none !important; }
 
-        /* ==================== Aovein 加载页 ==================== */
+        /* ==================== Aovein 加载页 (白色) ==================== */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #ffffff; z-index: 999999;
@@ -61,7 +76,7 @@
         .activate-btn:active { transform: scale(0.95); }
         .hidden-screen { opacity: 0; pointer-events: none; visibility: hidden; }
 
-        /* ==================== 动画与通用 ==================== */
+        /* ==================== UI 动画与样式 ==================== */
         @keyframes fadeInTitle { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInBar { from { opacity: 0; } to { opacity: 1; } }
         @keyframes progressFill { 0% { width: 0%; } 100% { width: 100%; } }
@@ -70,6 +85,9 @@
         .typing-dot { display: inline-block; animation: typing-bounce 1.4s infinite ease-in-out both; margin: 0 1px; }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 
+        /* iOS PWA 顶部安全区适配 */
+        header { padding-top: env(safe-area-inset-top); height: calc(50px + env(safe-area-inset-top)); }
+        
         input, textarea, select { -webkit-user-select: text !important; user-select: text !important; pointer-events: auto !important; cursor: text !important; transform: translate3d(0,0,0); }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -91,7 +109,6 @@
         .widget-bubble { background: white; border-radius: 12px; padding: 4px 8px; font-size: 10px; font-weight: bold; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; margin-bottom: 6px; white-space: normal; max-width: 70px; text-align: center; line-height: 1.2; word-break: break-all; }
         .widget-bubble::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; }
 
-        /* 微信相关 */
         .wechat-pill-tab { transition: all 0.2s ease; border-radius: 999px; padding: 6px 16px; font-size: 13px; font-weight: 500; }
         .wechat-pill-active { background-color: #000; color: #fff; }
         .wechat-pill-inactive { background-color: transparent; color: #333; }
@@ -109,34 +126,20 @@
         .chat-bubble-ai { background-color: #ffffff; color: #333; border-top-left-radius: 4px; }
         .chat-bubble-user { background-color: #f2f2f2; color: #333; border-top-right-radius: 4px; }
         .chat-timestamp-small { font-size: 10px; color: #999; margin-top: 2px; }
-        /* 引用样式 */
         .quote-block { background-color: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; color: #666; border-left: 2px solid #ccc; }
         .chat-bubble-user .quote-block { background-color: rgba(0,0,0,0.05); border-left-color: #999; }
 
-        /* 长按菜单 */
-        .chat-context-menu {
-            position: fixed; background: #4c4c4c; color: white; border-radius: 12px; padding: 0; 
-            z-index: 99999; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            display: flex; flex-wrap: wrap; width: 260px;
-        }
-        .chat-context-menu::after {
-            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-            border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #4c4c4c;
-        }
-        .context-item {
-            width: 25%; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 10px; gap: 4px; cursor: pointer;
-        }
+        .chat-context-menu { position: fixed; background: #4c4c4c; color: white; border-radius: 12px; padding: 0; z-index: 99999; box-shadow: 0 8px 30px rgba(0,0,0,0.4); display: flex; flex-wrap: wrap; width: 260px; }
+        .chat-context-menu::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #4c4c4c; }
+        .context-item { width: 25%; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; gap: 4px; cursor: pointer; }
         .context-item:active { background: rgba(255,255,255,0.1); border-radius: 8px; }
 
-        /* 开关按钮 */
         .switch-checkbox { display: none; }
         .switch-label { display: flex; align-items: center; justify-content: space-between; cursor: pointer; width: 50px; height: 30px; background: #d1d5db; border-radius: 100px; position: relative; transition: background-color .2s; }
         .switch-label .switch-button { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 45px; transition: 0.2s; background: #fff; box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29); }
         .switch-checkbox:checked + .switch-label .switch-button { left: calc(100% - 2px); transform: translateX(-100%); }
         .switch-checkbox:checked + .switch-label { background-color: #34C759; }
 
-        /* iOS风格列表选择器 (世界书) */
         .ios-list-modal { position: absolute; bottom: 0; left: 0; width: 100%; background: #f2f2f2; border-top-left-radius: 20px; border-top-right-radius: 20px; max-height: 70vh; overflow: hidden; display: flex; flex-direction: column; }
         .ios-list-header { padding: 15px; text-align: center; font-weight: bold; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; }
         .ios-list-content { overflow-y: auto; padding: 10px; background: #f2f2f2; }
@@ -148,6 +151,21 @@
     </style>
 </head>
 <body>
+
+<!-- PWA 注册脚本 (Service Worker) -->
+<script>
+    if ('serviceWorker' in navigator) {
+        // 创建一个简单的 SW 逻辑 (内联，实际部署建议独立文件)
+        const swCode = `
+            self.addEventListener('install', e => self.skipWaiting());
+            self.addEventListener('activate', e => self.clients.claim());
+            self.addEventListener('fetch', e => {}); 
+        `;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(console.error);
+    }
+</script>
 
 <!-- Aovein 启动加载页 -->
 <div id="loading-screen">
@@ -163,7 +181,7 @@
     <div class="activate-btn" onclick="attemptActivate()">立即激活</div>
 </div>
 
-<div id="app" v-cloak class="max-w-md mx-auto h-screen bg-[#f3f4f6] flex flex-col relative overflow-hidden shadow-2xl border-x border-gray-200" style="display: none;" @click="closeAllMenus">
+<div id="app" v-cloak class="max-w-md mx-auto h-screen bg-[#f3f4f6] flex flex-col relative overflow-hidden shadow-2xl border-x border-gray-200" style="display: none;">
 
     <!-- 全局弹窗 -->
     <transition name="fade"><div v-if="toast.show" class="fixed inset-0 z-[60000] flex items-center justify-center pointer-events-none"><div class="bg-black/70 text-white px-5 py-3 rounded-xl shadow-lg backdrop-blur-sm text-sm font-medium">{{ toast.message }}</div></div></transition>
@@ -197,7 +215,7 @@
             <div class="ios-list-modal animate-slide-up">
                 <div class="ios-list-header">选择文件夹 <button class="absolute right-4 text-blue-500 font-normal text-sm" @click="folderSelectModal.show = false">取消</button></div>
                 <div class="ios-list-content">
-                    <div class="ios-list-item" @click="selectWorldFolder(null)"><span class="text-gray-800 font-medium">根目录</span><i v-if="!worldModal.parentId" class="fas fa-check text-blue-500"></i></div>
+                    <div class="ios-list-item" @click="selectWorldFolder(null)"><span class="text-gray-800 font-medium">根目录 (不归类)</span><i v-if="!worldModal.parentId" class="fas fa-check text-blue-500"></i></div>
                     <div v-for="folder in folders" :key="folder.id" class="ios-list-item" @click="selectWorldFolder(folder.id)">
                         <div class="flex items-center gap-2"><i class="fas fa-folder text-yellow-400"></i><span class="text-gray-800 font-medium">{{ folder.name }}</span></div>
                         <i v-if="worldModal.parentId === folder.id" class="fas fa-check text-blue-500"></i>
@@ -211,11 +229,11 @@
     <transition name="scale"><div v-if="chatWizard.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] h-[70vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white"><button @click="closeChatWizard" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ chatWizard.step === 1 ? '选择我的面具' : (chatWizard.type === 'single' ? '选择好友' : '选择群成员') }}</h3><button v-if="chatWizard.step === 2 && chatWizard.type === 'group'" @click="finishCreateChat" class="text-green-600 font-bold text-sm bg-green-50 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="chatWizard.step === 1"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">没有可用面具，请去"我-面具"添加</div><div v-for="mask in masks" :key="mask.id" @click="selectWizardMask(mask)" class="bg-white border border-gray-100 p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer"><div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"></div><div class="flex-1"><h4 class="font-bold text-sm">{{ mask.name }}</h4><p class="text-xs text-gray-400">{{ mask.bio || '无介绍' }}</p></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div><div v-if="chatWizard.step === 2"><div v-if="wechatState.friendList.length === 0" class="text-center text-gray-400 mt-20 text-xs">通讯录暂无好友</div><div v-for="friend in wechatState.friendList" :key="friend.id" @click="selectWizardContact(friend)" class="bg-white border p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer transition" :class="chatWizard.selectedContacts.includes(friend.id) ? 'border-green-500 bg-green-50' : 'border-gray-100'"><div v-if="chatWizard.type === 'group'" class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center" :class="{'bg-green-500 border-green-500': chatWizard.selectedContacts.includes(friend.id)}"><i v-if="chatWizard.selectedContacts.includes(friend.id)" class="fas fa-check text-white text-[10px]"></i></div><div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden"><img v-if="friend.avatar" :src="friend.avatar" class="w-full h-full object-cover"></div><span class="font-bold text-sm">{{ friend.remark || friend.name }}</span></div></div></div></div></div></transition>
 
     <!-- 世界书添加/编辑文件 Modal (iOS UI) -->
-    <transition name="scale"><div v-if="worldModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] rounded-3xl overflow-hidden shadow-2xl p-6 space-y-4"><h3 class="text-lg font-bold text-center text-gray-900">{{ worldModal.id ? '编辑文件' : (worldModal.type === 'folder' ? '新建文件夹' : '新建文件') }}</h3><input v-model="worldModal.name" placeholder="请输入名称" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><div v-if="worldModal.type === 'file'" class="space-y-4"><div class="space-y-1"><label class="text-xs text-gray-500 ml-1">归类文件夹</label><div @click="folderSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 flex justify-between items-center cursor-pointer"><span :class="worldModal.parentId ? 'text-black' : 'text-gray-400'">{{ getFolderName(worldModal.parentId) }}</span><i class="fas fa-chevron-right text-xs text-gray-300"></i></div></div><textarea v-model="worldModal.content" placeholder="输入文件内容..." class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none h-32 resize-none"></textarea></div><div class="flex gap-3 pt-2"><button @click="worldModal.show = false" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">取消</button><button @click="saveWorldItem" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm">保存</button></div></div></div></transition>
+    <transition name="scale"><div v-if="worldModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] rounded-[24px] overflow-hidden shadow-2xl p-6 space-y-4"><h3 class="text-lg font-bold text-center text-gray-900">{{ worldModal.id ? '编辑文件' : (worldModal.type === 'folder' ? '新建文件夹' : '新建文件') }}</h3><input v-model="worldModal.name" placeholder="请输入名称" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><div v-if="worldModal.type === 'file'" class="space-y-4"><div class="space-y-1"><label class="text-xs text-gray-500 ml-1">归类文件夹</label><div @click="folderSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 flex justify-between items-center cursor-pointer text-gray-700"><span :class="worldModal.parentId ? 'text-black' : 'text-gray-400'">{{ getFolderName(worldModal.parentId) }}</span><i class="fas fa-chevron-right text-xs text-gray-300"></i></div></div><textarea v-model="worldModal.content" placeholder="输入文件内容..." class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none h-32 resize-none"></textarea></div><div class="flex gap-3 pt-2"><button @click="worldModal.show = false" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">取消</button><button @click="saveWorldItem" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm">保存</button></div></div></div></transition>
     
     <transition name="scale"><div v-if="addContactModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] max-h-[85vh] rounded-[24px] overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10"><button @click="addContactModal.show = false" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ newContact.id ? '编辑朋友' : '添加朋友' }}</h3><button @click="saveNewContact" class="text-green-600 font-bold text-sm bg-green-50 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-6 space-y-5"><div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative cursor-pointer active:opacity-70 transition" @click="triggerAddContactAvatar"><img v-if="newContact.avatar" :src="newContact.avatar" class="w-full h-full object-cover"><div v-else class="flex flex-col items-center text-gray-400"><i class="fas fa-camera text-2xl mb-1"></i><span class="text-[10px]">上传头像</span></div></div></div><div class="space-y-4"><div><label class="text-xs text-gray-500 ml-1 mb-1 block">姓名</label><input v-model="newContact.name" placeholder="输入姓名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">备注</label><input v-model="newContact.remark" placeholder="输入备注名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">网名 (ID)</label><input v-model="newContact.username" placeholder="输入网名/微信号" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">性别</label><div class="flex gap-3"><div @click="newContact.gender = '男'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='男'?'bg-blue-50 border-blue-200 text-blue-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-mars"></i> 男</div><div @click="newContact.gender = '女'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='女'?'bg-pink-50 border-pink-200 text-pink-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-venus"></i> 女</div></div></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">拍一拍</label><input v-model="newContact.nudge" placeholder="拍一拍后缀" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">个性签名</label><input v-model="newContact.signature" placeholder="输入个性签名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">背景资料</label><textarea v-model="newContact.bio" placeholder="输入人设、背景故事..." class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none h-24 resize-none"></textarea></div></div></div><input type="file" ref="addContactAvatarInput" accept="image/*" class="hidden" @change="handleAddContactAvatar"></div></div></transition>
 
-    <!-- 面具管理 Modal -->
+    <!-- 面具管理 Modal (Z-Index 50000) -->
     <transition name="scale"><div v-if="showMaskManager" class="fixed inset-0 z-[50000] bg-gray-50 flex flex-col"><div class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100"><button @click.stop="showMaskManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button><h1 class="text-[17px] font-bold">我的面具</h1><button @click="openMaskEditor(null)" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-plus"></i></button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无面具，请点击右上角添加</div><div v-for="mask in masks" :key="mask.id" @click="openMaskEditor(mask)" class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-100 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"><i v-else class="fas fa-mask flex h-full items-center justify-center text-purple-300 text-xl"></i></div><div><h3 class="font-bold text-gray-900">{{ mask.name }}</h3><p class="text-xs text-gray-400 line-clamp-1">{{ mask.bio || '暂无介绍' }}</p></div></div></div></div></transition>
     
     <!-- 面具编辑 Modal -->
@@ -388,33 +406,17 @@
                 <div @click="wechatState.activeNav='discover'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='discover' ? 'text-black' : 'text-gray-400'"><i class="far fa-compass"></i></div>
                 <div @click="wechatState.activeNav='me'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='me' ? 'text-black' : 'text-gray-400'"><i class="far fa-user"></i></div>
             </div>
+
+            <!-- 面具管理 View -->
+            <transition name="page-slide"><div v-if="showMaskManager" class="absolute inset-0 z-30 bg-gray-50 flex flex-col"><div class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100"><button @click.stop="showMaskManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button><h1 class="text-[17px] font-bold">我的面具</h1><button @click="openMaskEditor(null)" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-plus"></i></button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无面具，请点击右上角添加</div><div v-for="mask in masks" :key="mask.id" @click="openMaskEditor(mask)" class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-100 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"><i v-else class="fas fa-mask flex h-full items-center justify-center text-purple-300 text-xl"></i></div><div><h3 class="font-bold text-gray-900">{{ mask.name }}</h3><p class="text-xs text-gray-400 line-clamp-1">{{ mask.bio || '暂无介绍' }}</p></div></div></div></div></transition>
         </div>
     </transition>
 
-    <!-- 设置、主题、世界书 App (Code retained, templates suppressed for length but fully functional in logic) -->
+    <!-- 设置、主题、世界书 App 保持原样 (Template省略, 逻辑保留) -->
     <transition name="app-slide"><div v-if="currentApp === 'settings'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="navigateSettings('back')" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i v-if="settingsPage !== 'main'" class="fas fa-chevron-left text-sm"></i><i v-else class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">{{ settingsTitle }}</h1><div class="w-8"></div></header><main class="flex-1 overflow-y-auto relative"><transition name="page-slide"><div v-if="settingsPage === 'main'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100"><div class="w-14 h-14 rounded-full bg-gray-100 overflow-hidden"><img v-if="homeProfile.avatar" :src="homeProfile.avatar" class="w-full h-full object-cover"></div><div><div class="font-bold text-lg">{{ homeProfile.name }}</div><div class="text-xs text-gray-400">@{{ homeProfile.id }}</div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50"><div @click="navigateSettings('api-config')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center"><i class="fas fa-robot"></i></div><span class="font-medium text-gray-800">API 配置</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div @click="navigateSettings('notification')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center"><i class="fas fa-bell"></i></div><span class="font-medium text-gray-800">消息提示音</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div @click="navigateSettings('data-manage')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center"><i class="fas fa-database"></i></div><span class="font-medium text-gray-800">数据管理</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="p-4 flex items-center justify-between active:bg-gray-50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-purple-500 text-white flex items-center justify-center"><i class="fas fa-expand"></i></div><span class="font-medium text-gray-800">全屏模式</span></div><input type="checkbox" id="toggle-fs" class="switch-checkbox" v-model="isFullScreen" @change="toggleFullScreen"><label for="toggle-fs" class="switch-label"><div class="switch-button"></div></label></div><div class="p-4 flex items-center justify-between active:bg-gray-50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-gray-500 text-white flex items-center justify-center"><i class="fas fa-eye-slash"></i></div><span class="font-medium text-gray-800">隐藏状态栏</span></div><input type="checkbox" id="toggle-sb" class="switch-checkbox" v-model="hideStatusBar" @change="saveData"><label for="toggle-sb" class="switch-label"><div class="switch-button"></div></label></div></div></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'api-config'" class="absolute inset-0 p-4"><div class="space-y-5 pb-10"><div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4"><div><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">反代地址</label><input v-model="apiConfig.baseUrl" placeholder="https://..." class="w-full bg-gray-50 p-3 rounded-xl text-sm font-mono border border-gray-200 outline-none"></div><div><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">API 密钥</label><input v-model="apiConfig.apiKey" type="password" placeholder="sk-..." class="w-full bg-gray-50 p-3 rounded-xl text-sm font-mono border border-gray-200 outline-none"></div><div class="flex items-center gap-2"><button @click="fetchModels" :disabled="isLoading" class="flex-1 bg-gray-900 text-white py-2.5 rounded-xl text-sm font-bold active:scale-95 transition flex items-center justify-center gap-2"><i v-if="isLoading" class="fas fa-spinner fa-spin"></i><span v-else>拉取模型</span></button></div><div v-if="availableModels.length > 0" class="animate-fade-in"><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">选择模型</label><div @click="modelSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm font-medium border border-gray-200 flex justify-between items-center cursor-pointer"><span>{{ apiConfig.selectedModel || '点击选择' }}</span><i class="fas fa-chevron-down text-gray-400 text-xs"></i></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">API 预设</span><button @click="savePreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="apiPresets.length === 0" class="p-8 text-center text-gray-400 text-xs">暂无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(preset, idx) in apiPresets" :key="idx" class="p-4 flex items-center justify-between"><div class="flex-1 min-w-0 mr-4"><div class="font-bold text-gray-800 text-sm truncate">{{ preset.name }}</div><div class="text-[10px] text-gray-400 truncate">{{ preset.baseUrl }}</div></div><div class="flex items-center gap-2"><button @click="applyPreset(preset)" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-check text-xs"></i></button><button @click="deletePreset(idx)" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition"><i class="fas fa-trash text-xs"></i></button></div></div></div></div><button @click="saveSettings" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-200 active:scale-95 transition">保存配置</button></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'data-manage'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center"><div class="w-16 h-16 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-database"></i></div><h3 class="font-bold text-gray-900 text-lg">数据管理</h3><p class="text-xs text-gray-400 mt-2 px-4">备份恢复所有设置。</p></div><div class="grid grid-cols-2 gap-4"><button @click="exportData" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition"><div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-file-export"></i></div><span class="text-sm font-bold text-gray-700">导出</span></button><button @click="triggerImport" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition"><div class="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="fas fa-file-import"></i></div><span class="text-sm font-bold text-gray-700">导入</span></button></div><input type="file" ref="importInput" accept=".json" class="hidden" @change="handleImport"></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'notification'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"><div class="flex items-center justify-between mb-4"><span class="text-sm font-bold text-gray-700">当前提示音</span><span class="text-xs text-gray-400">{{ notificationConfig.currentName || '系统默认' }}</span></div><div class="flex gap-2"><button @click="triggerAudioUpload" class="flex-1 bg-gray-50 py-2.5 rounded-xl text-xs font-bold text-gray-700 active:bg-gray-100 transition border border-gray-100 flex items-center justify-center gap-2"><i class="fas fa-upload"></i> 导入</button><button @click="playCurrentSound" class="w-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100 active:scale-95 transition"><i class="fas fa-play"></i></button></div><input type="file" ref="audioInput" accept="audio/*" class="hidden" @change="handleAudioUpload"><button @click="simulateAiMessage" class="w-full mt-3 bg-gray-800 text-white py-2.5 rounded-xl text-xs font-bold active:bg-black transition">测试音效</button></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">音频预设</span><button @click="saveSoundPreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="soundPresets.length === 0" class="p-6 text-center text-gray-400 text-xs">暂无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(sound, idx) in soundPresets" :key="idx" class="p-4 flex items-center justify-between"><span class="font-bold text-gray-700 text-sm truncate max-w-[50%]">{{ sound.name }}</span><div class="flex items-center gap-2"><button @click="playPresetSound(sound)" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fas fa-play text-[10px]"></i></button><button @click="applySoundPreset(sound)" class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-check text-[10px]"></i></button><button @click="deleteSoundPreset(idx)" class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button></div></div></div></div></div></div></transition></main></div></transition>
     <transition name="app-slide"><div v-if="currentApp === 'themes'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="navigateThemes('back')" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i v-if="themesPage !== 'main'" class="fas fa-chevron-left text-sm"></i><i v-else class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">{{ themesTitle }}</h1><div class="w-8"></div></header><main class="flex-1 overflow-y-auto relative"><transition name="page-slide"><div v-if="themesPage === 'main'" class="absolute inset-0 p-4"><div class="grid grid-cols-1 gap-4"><div @click="navigateThemes('wallpaper')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-image"></i></div><div><div class="font-bold text-gray-800">壁纸设置</div><div class="text-xs text-gray-400 mt-0.5">更换主屏幕背景</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('font')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl"><i class="fas fa-font"></i></div><div><div class="font-bold text-gray-800">字体设置</div><div class="text-xs text-gray-400 mt-0.5">自定义字体、大小和颜色</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('icons')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-icons"></i></div><div><div class="font-bold text-gray-800">图标设置</div><div class="text-xs text-gray-400 mt-0.5">自定义 App 图标与名称</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'wallpaper'" class="absolute inset-0 p-4 space-y-6"><div class="w-full aspect-[9/16] bg-gray-200 rounded-3xl overflow-hidden shadow-lg relative mx-auto max-w-[240px] border-4 border-white"><img v-if="themeConfig.wallpaper" :src="themeConfig.wallpaper" class="w-full h-full object-cover"><div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100"><i class="fas fa-image text-3xl mb-2"></i><span class="text-xs">默认壁纸</span></div></div><div class="flex flex-col gap-3"><button @click="triggerWallpaperUpload" class="w-full bg-gray-900 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition shadow-lg">从相册选择</button><button @click="resetWallpaper" class="w-full bg-white text-gray-600 py-3.5 rounded-2xl font-bold border border-gray-200 active:bg-gray-50 transition">恢复默认</button></div><input type="file" ref="wallpaperInput" accept="image/*" class="hidden" @change="handleWallpaperUpload"></div></transition><transition name="page-slide"><div v-if="themesPage === 'font'" class="absolute inset-0 p-4 pb-20"><div class="space-y-6"><div class="bg-gray-100 rounded-2xl p-6 text-center border border-gray-200" :style="{fontFamily: themeConfig.fontFamily}"><div class="text-2xl font-bold mb-2" :style="{color: themeConfig.fontColor}">12:30</div><div class="text-lg" :style="{color: themeConfig.fontColor}">Hello World</div><div class="text-sm opacity-60" :style="{color: themeConfig.fontColor}">预览字体效果</div></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3"><label class="text-xs font-bold text-gray-500 ml-1">字体 URL</label><div class="flex gap-2"><input v-model="fontInputUrl" placeholder="https://..." class="flex-1 bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><button @click="loadFontFromUrl" :disabled="isLoading" class="bg-black text-white px-4 rounded-xl font-bold text-xs active:scale-95 transition min-w-[60px]"><span v-if="!isLoading">预览</span><i v-else class="fas fa-spinner fa-spin"></i></button></div></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-4"><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">大小</span><span class="text-xs text-gray-400">{{ (themeConfig.fontSize * 100).toFixed(0) }}%</span></div><input type="range" min="0.8" max="1.2" step="0.05" v-model.number="themeConfig.fontSize" @change="saveData" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"></div><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">色号</span></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full border border-gray-200 shadow-sm shrink-0" :style="{backgroundColor: themeConfig.fontColor}"></div><input type="text" v-model="themeConfig.fontColor" @change="saveData" placeholder="#000000" class="flex-1 bg-gray-50 px-3 py-2 rounded-xl text-sm border border-gray-200 font-mono outline-none uppercase"></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">预设</span><button @click="saveFontPreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="fontPresets.length === 0" class="p-6 text-center text-gray-400 text-xs">无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(fp, idx) in fontPresets" :key="idx" class="p-4 flex items-center justify-between"><div class="flex-1 min-w-0 mr-2"><div class="font-bold text-gray-800 text-sm truncate" :style="{fontFamily: fp.fontFamily}">{{ fp.name }}</div></div><div class="flex items-center gap-2"><button @click="applyFontPreset(fp)" class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-check text-[10px]"></i></button><button @click="deleteFontPreset(idx)" class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button></div></div></div></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'icons'" class="absolute inset-0 p-4 pb-20"><div class="space-y-4"><div class="flex justify-end"><button @click="resetAllIcons" class="text-xs text-red-500 font-bold px-3 py-1 bg-red-50 rounded-lg active:bg-red-100">重置所有</button></div><div class="space-y-3"><div v-for="appId in appList" :key="appId" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center bg-gray-50 shrink-0"><img v-if="hasCustomIcon(appId)" :src="getAppIcon(appId)" class="w-full h-full object-cover"><i v-else :class="getDefaultIconClass(appId) + ' text-gray-400 text-xl'"></i></div><div class="flex-1"><label class="text-[10px] font-bold text-gray-400 mb-1 block">应用名称</label><input :value="getAppName(appId)" @input="(e)=>setAppName(appId, e.target.value)" class="w-full bg-gray-50 px-2 py-1.5 rounded-lg text-sm border border-gray-200 outline-none"></div></div><div class="flex gap-2"><input v-model="tempIconUrls[appId]" placeholder="图标 URL" class="flex-1 bg-gray-50 px-3 py-2 rounded-lg text-xs border border-gray-200 outline-none"><button @click="setAppIcon(appId, tempIconUrls[appId])" class="px-3 bg-black text-white rounded-lg text-xs font-bold">确定</button><button @click="triggerIconUpload(appId)" class="px-3 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold active:bg-gray-200"><i class="fas fa-image"></i></button><button @click="resetApp(appId)" class="px-3 bg-red-50 text-red-500 rounded-lg text-xs active:bg-red-100"><i class="fas fa-undo"></i></button></div></div></div><input type="file" ref="iconUploadInput" accept="image/*" class="hidden" @change="handleIconFile"></div></div></transition></main></div></transition>
     <transition name="app-slide"><div v-if="currentApp === 'worldbook'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="closeApp" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">世界书</h1><div class="flex gap-2"><button @click="openWorldModal('folder')" class="w-8 h-8 flex items-center justify-center text-yellow-600 bg-yellow-50 rounded-full"><i class="fas fa-folder-plus text-xs"></i></button><button @click="openWorldModal('file')" class="w-8 h-8 flex items-center justify-center text-blue-600 bg-blue-50 rounded-full"><i class="fas fa-file-circle-plus text-xs"></i></button></div></header><main class="flex-1 overflow-y-auto p-4 space-y-2"><div v-if="folders.length === 0 && rootFiles.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无内容，请点击右上角添加</div><div v-for="folder in folders" :key="folder.id" class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm"><div @click="toggleFolder(folder.id)" class="p-4 flex items-center justify-between active:bg-gray-50 transition cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-folder text-yellow-400 text-lg"></i><span class="font-bold text-gray-800 text-sm">{{ folder.name }}</span></div><div class="flex items-center gap-3"><button @click.stop="deleteWorldItem(folder.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button><i class="fas fa-chevron-right text-gray-300 text-xs transition-transform duration-200" :class="{'rotate-90': expandedFolders.includes(folder.id)}"></i></div></div><transition name="expand"><div v-if="expandedFolders.includes(folder.id)" class="bg-gray-50 border-t border-gray-100"><div v-if="getFiles(folder.id).length===0" class="p-3 text-center text-xs text-gray-400">空文件夹</div><div v-for="file in getFiles(folder.id)" :key="file.id" @click="editWorldItem(file)" class="p-3 pl-10 border-b border-gray-100 last:border-0 flex items-center justify-between active:bg-gray-100 cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-file-alt text-blue-400 text-sm"></i><span class="text-sm text-gray-700">{{ file.name }}</span></div><button @click.stop="deleteWorldItem(file.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div></div></transition></div><div v-for="file in rootFiles" :key="file.id" @click="editWorldItem(file)" class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between active:scale-[0.98] transition cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-file-alt text-gray-400 text-lg"></i><span class="font-bold text-gray-800 text-sm">{{ file.name }}</span></div><button @click.stop="deleteWorldItem(file.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div></main></div></transition>
-    
-    <!-- 世界书添加/编辑文件 Modal (iOS UI) -->
-    <transition name="scale"><div v-if="worldModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] rounded-[24px] overflow-hidden shadow-2xl p-6 space-y-4"><h3 class="text-lg font-bold text-center text-gray-900">{{ worldModal.id ? '编辑文件' : (worldModal.type === 'folder' ? '新建文件夹' : '新建文件') }}</h3><input v-model="worldModal.name" placeholder="请输入名称" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><div v-if="worldModal.type === 'file'" class="space-y-4"><div class="space-y-1"><label class="text-xs text-gray-500 ml-1">归类文件夹</label><div @click="folderSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 flex justify-between items-center cursor-pointer text-gray-700"><span :class="worldModal.parentId ? 'text-black' : 'text-gray-400'">{{ getFolderName(worldModal.parentId) }}</span><i class="fas fa-chevron-right text-xs text-gray-300"></i></div></div><textarea v-model="worldModal.content" placeholder="输入文件内容..." class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none h-32 resize-none"></textarea></div><div class="flex gap-3 pt-2"><button @click="worldModal.show = false" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">取消</button><button @click="saveWorldItem" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm">保存</button></div></div></div></transition>
-    
-    <!-- Folder Selection Sheet -->
-    <transition name="app-slide">
-        <div v-if="folderSelectModal.show" class="fixed inset-0 z-[66000]">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="folderSelectModal.show = false"></div>
-            <div class="ios-list-modal">
-                <div class="ios-list-header">选择文件夹 <button class="absolute right-4 text-blue-500 font-normal text-sm" @click="folderSelectModal.show = false">取消</button></div>
-                <div class="ios-list-content">
-                    <div class="ios-list-item" @click="selectWorldFolder(null)"><span class="text-gray-800 font-medium">根目录 (不归类)</span><i v-if="!worldModal.parentId" class="fas fa-check text-blue-500"></i></div>
-                    <div v-for="folder in folders" :key="folder.id" class="ios-list-item" @click="selectWorldFolder(folder.id)">
-                        <div class="flex items-center gap-2"><i class="fas fa-folder text-yellow-400"></i><span class="text-gray-800 font-medium">{{ folder.name }}</span></div>
-                        <i v-if="worldModal.parentId === folder.id" class="fas fa-check text-blue-500"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </transition>
+    <transition name="scale"><div v-if="viewFileModal.show" class="fixed inset-0 z-[9000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] max-h-[70%] rounded-3xl overflow-hidden shadow-2xl flex flex-col"><div class="p-4 border-b border-gray-100 flex justify-between items-center"><h3 class="font-bold text-lg">{{ viewFileModal.data.name }}</h3><button @click="saveFileContent" class="text-blue-600 font-bold text-sm">保存</button></div><textarea v-model="viewFileModal.data.content" class="flex-1 p-4 text-sm leading-relaxed outline-none resize-none"></textarea><button @click="viewFileModal.show=false" class="p-4 bg-gray-50 text-gray-500 font-bold text-sm">关闭</button></div></div></transition>
 
 </div>
 
@@ -468,8 +470,8 @@ createApp({
             addContactModal: { show: false }, chatWizard: { show: false, step: 1, type: 'single', selectedContacts: [], selectedMask: null },
             newContact: { name: '', remark: '', username: '', gender: '男', bio: '', nudge: '', signature: '', avatar: '' },
             masks: [], showMaskManager: false, maskModal: { show: false }, maskForm: { id: null, name: '', username: '', gender: '女', bio: '', nudge: '', signature: '', avatar: '' },
-            worldData: [], expandedFolders: [], worldModal: { show: false, type: 'folder', name: '', content: '', parentId: '' }, folderSelectModal: { show: false }, // New
-            worldBinderModal: { show: false },
+            worldData: [], expandedFolders: [], worldModal: { show: false, type: 'folder', name: '', content: '', parentId: '' }, viewFileModal: { show: false, data: {} },
+            worldBinderModal: { show: false }, folderSelectModal: { show: false },
             modelSelectModal: { show: false }, 
             chatContextMenu: { show: false, x: 0, y: 0, msg: null, index: -1, isSelf: false },
 
@@ -637,11 +639,15 @@ createApp({
             }
 
             let contextMessages = [];
-            let systemPrompt = `Roleplay. You: ${friend ? friend.name : session.name}. Bio: ${friend ? friend.bio : ''}. User: ${mask.name}. Bio: ${mask.bio}. ${worldContext} Reply naturally. Use "。" to separate short messages. Max 7 msgs.`;
+            let systemPrompt = `Roleplay. You: ${friend ? friend.name : session.name}. Bio: ${friend ? friend.bio : 'None'}. 
+            User character: Name: ${mask.name}. Bio: ${mask.bio}.
+            Reply in character, keep it short and natural like a chat message. ${worldContext}`;
             
             contextMessages.push({ role: 'system', content: systemPrompt });
             const recentMsgs = session.messages.slice(-10);
-            recentMsgs.forEach(m => { contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: m.content }); });
+            recentMsgs.forEach(m => {
+                contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: m.content });
+            });
 
             try {
                 let url = this.apiConfig.baseUrl.trim().replace(/\/+$/, '');
@@ -774,13 +780,32 @@ createApp({
         },
         deleteMask(id) { this.showConfirm('删除此面具？', () => { this.masks = this.masks.filter(m => m.id !== id); this.saveData(); this.maskModal.show = false; }); },
 
-        async fetchModels() { if (!this.apiConfig.baseUrl) return this.showToast('请输入反代地址'); if (!this.apiConfig.apiKey) return this.showToast('请输入 API 密钥'); this.isLoading = true; try { let url = this.apiConfig.baseUrl.trim().replace(/\/+$/, ''); if (!url.endsWith('/v1')) url += '/v1'; const res = await fetch(`${url}/models`, { method: 'GET', headers: { 'Authorization': `Bearer ${this.apiConfig.apiKey.trim()}` } }); if (!res.ok) throw new Error(`HTTP ${res.status}`); const data = await res.json(); if (data && Array.isArray(data.data)) { this.availableModels = data.data.map(m => m.id); this.showToast(`获取成功: ${this.availableModels.length}个`); if (!this.apiConfig.selectedModel && this.availableModels.length > 0) this.apiConfig.selectedModel = this.availableModels[0]; this.modelSelectModal.show=true; } else throw new Error('数据格式错误'); } catch (e) { console.error(e); this.showToast('拉取失败: ' + e.message); if(this.availableModels.length===0) this.availableModels = ['gpt-3.5-turbo', 'gpt-4', 'claude-3-opus']; } finally { this.isLoading = false; } },
+        async fetchModels() {
+            if (!this.apiConfig.baseUrl) return this.showToast('请输入反代地址');
+            if (this.apiConfig.baseUrl.includes('api520.pro')) return this.showToast('该反代地址不稳定，已被屏蔽');
+            if (!this.apiConfig.apiKey) return this.showToast('请输入 API 密钥');
+            this.isLoading = true;
+            try {
+                let url = this.apiConfig.baseUrl.trim().replace(/\/+$/, '');
+                if (!url.endsWith('/v1')) url += '/v1';
+                const res = await fetch(`${url}/models`, { method: 'GET', headers: { 'Authorization': `Bearer ${this.apiConfig.apiKey.trim()}` } });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (data && Array.isArray(data.data)) { this.availableModels = data.data.map(m => m.id); this.showToast(`获取成功: ${this.availableModels.length}个`); if (!this.apiConfig.selectedModel && this.availableModels.length > 0) this.apiConfig.selectedModel = this.availableModels[0]; this.modelSelectModal.show=true; } else throw new Error('数据格式错误');
+            } catch (e) { console.error(e); this.showToast('拉取失败: ' + e.message); if(this.availableModels.length===0) this.availableModels = ['gpt-3.5-turbo', 'gpt-4', 'claude-3-opus']; } finally { this.isLoading = false; }
+        },
         openWorldModal(type) { this.worldModal = { show: true, type, name: '', content: '', parentId: '' }; },
-        editWorldItem(item) { this.worldModal = { ...item, show: true }; this.worldModal.show = true; },
+        editWorldItem(item) { this.worldModal = { ...item, show: true }; },
         saveWorldItem() {
             if(!this.worldModal.name) return this.showToast('请输入名称');
-            if (this.worldModal.id) { const idx = this.worldData.findIndex(i => i.id === this.worldModal.id); if (idx !== -1) { this.worldData[idx] = { ...this.worldData[idx], name: this.worldModal.name, content: this.worldModal.content, parentId: this.worldModal.parentId }; } }
-            else { const item = { id: Date.now().toString(), type: this.worldModal.type, name: this.worldModal.name, parentId: this.worldModal.parentId || null }; if(this.worldModal.type === 'file') item.content = this.worldModal.content; this.worldData.push(item); }
+            if (this.worldModal.id) {
+                const idx = this.worldData.findIndex(i => i.id === this.worldModal.id);
+                if (idx !== -1) { this.worldData[idx] = { ...this.worldData[idx], name: this.worldModal.name, content: this.worldModal.content, parentId: this.worldModal.parentId }; }
+            } else {
+                const item = { id: Date.now().toString(), type: this.worldModal.type, name: this.worldModal.name, parentId: this.worldModal.parentId || null };
+                if(this.worldModal.type === 'file') item.content = this.worldModal.content;
+                this.worldData.push(item); 
+            }
             this.saveData(); this.worldModal.show = false;
         },
         deleteWorldItem(id) { this.showConfirm('确定删除？', () => { this.worldData = this.worldData.filter(i => i.id !== id && i.parentId !== id); this.saveData(); }); },
@@ -802,7 +827,17 @@ createApp({
         async handleIconFile(e) { const f = e.target.files[0]; if(f && this.uploadingAppId) { try { const url = await compressImage(f, 200); this.setAppIcon(this.uploadingAppId, url); } catch(e){} } e.target.value = ''; },
         resetApp(id) { if(this.appCustomization[id]) { delete this.appCustomization[id]; this.saveData(); this.showToast('已重置'); } },
         resetAllIcons() { this.showConfirm("重置所有？", () => { this.appCustomization = {}; this.saveData(); }); },
-        async loadFontFromUrl() { if(!this.fontInputUrl) return this.showToast('请输入URL'); this.isLoading=true; try { const n='CF_'+Date.now(); await this.loadFont(this.fontInputUrl, n); this.themeConfig.fontFamily=n; this.themeConfig.fontUrl=this.fontInputUrl; this.saveData(); this.showToast('字体已应用'); } catch(e){this.showToast('失败');} finally{this.isLoading=false;} },
+        async loadFontFromUrl() { 
+            if(!this.fontInputUrl) return this.showToast('请输入URL'); 
+            this.isLoading=true; 
+            try { 
+                const n='PreviewFont_'+Date.now(); 
+                await this.loadFont(this.fontInputUrl, n); 
+                this.themeConfig.fontFamily=n; 
+                this.themeConfig.fontUrl=this.fontInputUrl; 
+                this.showToast('预览已应用'); 
+            } catch(e){ this.showToast('字体加载失败'); } finally{ this.isLoading=false; } 
+        },
         async loadFont(u, n) { const f = new FontFace(n, `url(${u})`); await f.load(); document.fonts.add(f); },
         saveFontPreset() { this.showInput("预设名称", "", "", (n) => { if(n) { this.fontPresets.push({ name:n, fontFamily:this.themeConfig.fontFamily, fontUrl:this.themeConfig.fontUrl, fontSize:this.themeConfig.fontSize, fontColor:this.themeConfig.fontColor }); this.saveData(); } }); },
         applyFontPreset(p) { if(p.fontUrl) this.loadFont(p.fontUrl, p.fontFamily); this.themeConfig.fontFamily=p.fontFamily; this.themeConfig.fontUrl=p.fontUrl; this.themeConfig.fontSize=p.fontSize; this.themeConfig.fontColor=p.fontColor; this.saveData(); },
@@ -820,7 +855,7 @@ createApp({
         deleteSoundPreset(i) { this.showConfirm("删除？",()=>{this.soundPresets.splice(i,1);this.saveData();}); },
         
         // Import Logic Fixed
-        exportData() { const d={...this.$data}; delete d.isAppOpen; delete d.currentApp; delete d.showMaskManager; delete d.maskModal.show; delete d.addContactModal.show; delete d.chatWizard.show; const b=new Blob([JSON.stringify(d)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='backup.json'; a.click(); },
+        exportData() { const d={...this.$data}; delete d.isAppOpen; delete d.currentApp; delete d.showMaskManager; delete d.maskModal.show; delete d.addContactModal.show; delete d.chatWizard.show; delete d.chatContextMenu.show; const b=new Blob([JSON.stringify(d)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='backup.json'; a.click(); },
         triggerImport() { this.$refs.importInput.click(); },
         handleImport(e) { 
             const f=e.target.files[0]; if(!f)return; 
@@ -829,10 +864,12 @@ createApp({
                 try { 
                     const d=JSON.parse(ev.target.result); 
                     Object.keys(d).forEach(k => {
-                        if (this.$data.hasOwnProperty(k) && k !== 'isActivated' && k !== 'deviceId') { this[k] = d[k]; }
+                        if (this.$data.hasOwnProperty(k) && k !== 'isActivated' && k !== 'deviceId') {
+                            this[k] = d[k];
+                        }
                     });
-                    this.saveData();
-                    if(localStorage.getItem('onyunx_is_activated')) this.isActivated = true; 
+                    this.saveData(); 
+                    if(localStorage.getItem('onyunx_is_activated')) this.isActivated = true;
                     this.showToast('导入成功，即将刷新'); 
                     setTimeout(() => location.reload(), 1000); 
                 } catch(e){ this.showToast('导入失败'); } 
@@ -850,12 +887,8 @@ createApp({
         editCustomWidget(i, f) { let t = f==='bubble'?'气泡文字':'下方文字'; this.showInput(t, this.customWidgets[i][f], "", (v) => { if(v){ this.customWidgets[i][f]=v; this.saveData(); } }); },
         triggerWidgetImageUpload(i) { this.editingWidgetId=i; if(this.$refs.widgetImageInput)this.$refs.widgetImageInput.click(); },
         async handleWidgetImageChange(e) { const f=e.target.files[0]; if(!f)return; try { this.customWidgets[this.editingWidgetId].image = await compressImage(f); this.saveData(); } catch(e){} },
-        saveData() { try { localStorage.setItem('onyunx_hybrid_v32', JSON.stringify(this.$data)); } catch(e){} },
-        loadData() { 
-            const s=localStorage.getItem('onyunx_hybrid_v32'); 
-            if(s) { try { const d=JSON.parse(s); Object.assign(this.$data, d); } catch(e){} }
-            if (localStorage.getItem('onyunx_is_activated') === 'true') { this.isActivated = true; }
-        },
+        saveData() { try { localStorage.setItem('onyunx_hybrid_v33', JSON.stringify(this.$data)); } catch(e){} },
+        loadData() { const s=localStorage.getItem('onyunx_hybrid_v33'); if(s) { try { const d=JSON.parse(s); Object.assign(this.$data, d); } catch(e){} } if (localStorage.getItem('onyunx_is_activated') === 'true') { this.isActivated = true; } },
         showToast(m) { this.toast.message=m; this.toast.show=true; setTimeout(()=>{this.toast.show=false},2000); },
         showInput(t,v,p,cb) { this.inputModal={show:true,title:t,value:v,placeholder:p,callback:cb,desc:''}; },
         showConfirm(m, cb) { this.confirmModal={show:true, message:m, callback:cb}; },
