@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aovein OS - Ultimate v9 (Fixed)</title>
+    <title>Aovein OS - Ultimate v15 (Mask Fixed)</title>
     <!-- 依赖库 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* 全局配置 - 字体变量绑定在 body */
+        /* 全局配置 */
         body { 
             background-color: #000; 
             color: #000; 
@@ -80,7 +80,6 @@
         .page-slide-enter-from { transform: translateX(100%); }
         .page-slide-leave-to { transform: translateX(-20%); opacity: 0; }
         
-        /* 图标样式 - 修复颜色显示 */
         .home-icon img { transition: all 0.2s; border-radius: 12px; }
         .home-icon:active img { transform: scale(0.9); }
         .home-icon i { color: #9ca3af; transition: color 0.2s; }
@@ -107,15 +106,67 @@
         .chat-bubble { border-radius: 18px; padding: 8px 12px; font-size: 14px; max-width: 100%; line-height: 1.4; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.03); }
         .chat-bubble-ai { background-color: #ffffff; color: #333; border-top-left-radius: 4px; }
         .chat-bubble-user { background-color: #f2f2f2; color: #333; border-top-right-radius: 4px; }
+        .chat-bubble-voice { display: flex; align-items: center; gap: 8px; min-width: 60px; cursor: pointer; transition: width 0.2s ease; }
+        /* 图片消息样式 */
+        .chat-bubble-image { padding: 4px; border-radius: 12px; overflow: hidden; background: transparent; box-shadow: none; }
+        .chat-bubble-image img { border-radius: 8px; max-width: 180px; max-height: 180px; }
+        
+        /* 灰色图片 (Fake Image) 样式 */
+        .chat-bubble-fake-image { 
+            width: 140px; height: 190px; background-color: #e5e7eb; 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+        .fake-image-text { 
+            padding: 15px; font-size: 13px; text-align: center; color: #374151; font-weight: 500;
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 红包与转账气泡 */
+        .chat-bubble-finance { padding: 0; overflow: hidden; color: white; width: 230px; display: flex; flex-direction: column; cursor: pointer; }
+        .chat-bubble-transfer { background: #fa9d3b; }
+        .chat-bubble-transfer.received { background: #f7bb79; opacity: 0.9; } 
+        .chat-bubble-redpacket { background: #ea5f39 !important; }
+        
+        .finance-content { padding: 15px; display: flex; align-items: center; gap: 12px; }
+        .finance-icon-box { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fa9d3b; font-size: 20px; }
+        .chat-bubble-redpacket .finance-icon-box { color: #ea5f39; background: #fce8cd; }
+
+        .finance-text { display: flex; flex-direction: column; color: white; }
+        .finance-title { font-size: 15px; font-weight: 500; }
+        .finance-desc { font-size: 12px; opacity: 0.9; margin-top: 2px;}
+        .finance-footer { background: white; padding: 6px 12px; font-size: 11px; color: #999; border-top: 1px solid rgba(255,255,255,0.2); }
+
+        /* 亲密付气泡 */
+        .chat-bubble-qinmi { background: #ffffff; color: #333; padding: 0; overflow: hidden; width: 240px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #eee; border-radius: 12px !important; }
+        .qinmi-header { background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%); padding: 15px; display: flex; align-items: center; gap: 12px; color: white; }
+        .qinmi-icon { font-size: 24px; }
+        .qinmi-body { padding: 12px; font-size: 13px; color: #666; }
+        .qinmi-footer { border-top: 1px solid #f5f5f5; padding: 8px 12px; font-size: 11px; color: #999; display: flex; justify-content: space-between; align-items: center; }
+
         .chat-timestamp-small { font-size: 10px; color: #999; margin-top: 2px; }
         .quote-block { background-color: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; color: #666; border-left: 2px solid #ccc; }
         .chat-bubble-user .quote-block { background-color: rgba(0,0,0,0.05); border-left-color: #999; }
-        .forward-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 10px; width: 200px; display: flex; flex-direction: column; gap: 4px; }
-        .forward-title { font-size: 14px; font-weight: bold; }
-        .forward-content { font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 4px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* 转发卡片样式 */
+        .forward-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 12px; width: 220px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .forward-title { font-size: 14px; font-weight: bold; color: #333; border-bottom: 1px solid #f5f5f5; padding-bottom: 4px; margin-bottom: 2px; }
+        .forward-content { font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
 
-        .system-recall-tip { text-align: center; font-size: 12px; color: #9ca3af; margin: 8px 0; }
-        .recall-link { color: #576b95; cursor: pointer; margin-left: 4px; }
+        /* 语音转文字区 */
+        .voice-transcription { font-size: 12px; color: #666; background: rgba(0,0,0,0.05); padding: 6px 10px; border-radius: 8px; margin-top: 4px; border-top: 1px solid rgba(0,0,0,0.05); }
+
+        /* 语音波形动画 */
+        .voice-wave-container { display: flex; align-items: center; gap: 2px; height: 16px; }
+        .voice-wave-bar { width: 3px; background-color: currentColor; border-radius: 2px; }
+        .voice-wave-bar:nth-child(1) { height: 6px; }
+        .voice-wave-bar:nth-child(2) { height: 12px; }
+        .voice-wave-bar:nth-child(3) { height: 9px; }
+
+        .system-recall-tip { text-align: center; font-size: 12px; color: #9ca3af; margin: 12px 0; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .recall-link { color: #576b95; cursor: pointer; font-weight: bold; }
 
         /* 长按菜单 */
         .chat-context-menu {
@@ -147,7 +198,7 @@
         .switch-label { display: flex; align-items: center; justify-content: space-between; cursor: pointer; width: 50px; height: 30px; background: #d1d5db; border-radius: 100px; position: relative; transition: background-color .2s; }
         .switch-label .switch-button { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 45px; transition: 0.2s; background: #fff; box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29); }
         .switch-checkbox:checked + .switch-label .switch-button { left: calc(100% - 2px); transform: translateX(-100%); }
-        .switch-checkbox:checked + .switch-label { background-color: #34C759; }
+        .switch-checkbox:checked + .switch-label { background-color: #000; }
 
         /* iOS风格列表选择器 */
         .ios-list-modal { position: absolute; bottom: 0; left: 0; width: 100%; background: #f2f2f2; border-top-left-radius: 20px; border-top-right-radius: 20px; max-height: 70vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -157,6 +208,62 @@
         .ios-list-item:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
         .ios-list-item:last-child { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; border-bottom: none; }
         .ios-list-item:active { background: #eee; }
+
+        /* 新版功能菜单（回形针） */
+        .chat-attach-menu { 
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%); width: 95%; 
+            background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 20px 10px; 
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.15); border: 1px solid #f0f0f0; 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; z-index: 50; 
+        }
+        .attach-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.1s; }
+        .attach-item:active { transform: scale(0.95); }
+        .attach-icon-box { 
+            width: 54px; height: 54px; background: #fff; border-radius: 16px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; color: #4b5563; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+        }
+        .attach-label { font-size: 11px; color: #666; font-weight: 500; }
+
+        /* 红包详情页样式 */
+        .red-packet-bg { background-color: #f3f4f6; }
+        .rp-header { 
+            background: #d44d44; position: relative; height: 160px; 
+            border-bottom-left-radius: 50% 30px; border-bottom-right-radius: 50% 30px; 
+        }
+        .rp-avatar-box { 
+            width: 70px; height: 70px; border-radius: 6px; overflow: hidden; 
+            position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
+            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 10px rgba(0,0,0,0.05); background: white;
+        }
+
+        /* 亲密付详情样式 */
+        .qinmi-detail-bg { background: #F5F5F5; color: #333; }
+        .qinmi-card-detail { background: #fff; margin: 15px; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+        .qinmi-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f5f5f5; padding-bottom: 15px; }
+        .qinmi-balance-big { font-size: 32px; font-weight: bold; color: #333; margin: 10px 0; }
+
+        /* 朋友圈样式 */
+        .moments-header { height: 300px; position: relative; background-color: #333; margin-bottom: 40px; }
+        .moments-cover { width: 100%; height: 100%; object-fit: cover; }
+        .moments-user { position: absolute; bottom: -20px; right: 20px; display: flex; align-items: flex-end; gap: 15px; }
+        .moments-username { color: white; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5); margin-bottom: 30px; font-size: 18px; }
+        .moments-avatar { width: 70px; height: 70px; border-radius: 12px; border: 2px solid white; overflow: hidden; background: white; }
+        .moment-item { padding: 15px 15px 20px 15px; display: flex; gap: 12px; border-bottom: 1px solid #f5f5f5; }
+        .moment-avatar { width: 42px; height: 42px; border-radius: 6px; background: #eee; overflow: hidden; shrink: 0; }
+        .moment-content { flex: 1; }
+        .moment-name { color: #576b95; font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+        .moment-text { font-size: 15px; color: #333; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
+        .moment-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 260px; margin-bottom: 8px; }
+        .moment-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #f0f0f0; }
+        .moment-image.single { max-width: 180px; max-height: 180px; width: auto; aspect-ratio: auto; }
+        .moment-meta { display: flex; justify-content: space-between; align-items: center; }
+        .moment-time { font-size: 12px; color: #999; }
+        .moment-action { background: #f7f7f7; padding: 2px 8px; border-radius: 4px; color: #576b95; font-size: 14px; }
+        .moment-likes-comments { background: #f7f7f7; border-radius: 4px; margin-top: 8px; padding: 4px 8px; font-size: 13px; }
+        .moment-likes { color: #576b95; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 4px; margin-bottom: 4px; display: flex; items-center; gap: 4px; }
+        .moment-comment-item { margin-bottom: 2px; }
+        .moment-comment-user { color: #576b95; font-weight: 500; }
 
     </style>
 </head>
@@ -181,8 +288,119 @@
 
     <!-- 全局弹窗 -->
     <transition name="fade"><div v-if="toast.show" class="fixed inset-0 z-[60000] flex items-center justify-center pointer-events-none"><div class="bg-black/70 text-white px-5 py-3 rounded-xl shadow-lg backdrop-blur-sm text-sm font-medium">{{ toast.message }}</div></div></transition>
-    <transition name="scale"><div v-if="inputModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[80%] max-w-xs rounded-2xl overflow-hidden shadow-2xl transform transition-all"><div class="p-5"><h3 class="text-lg font-bold text-gray-900 mb-1 text-center">{{ inputModal.title }}</h3><p v-if="inputModal.desc" class="text-xs text-gray-500 mb-2 text-center">{{ inputModal.desc }}</p><input v-model="inputModal.value" :placeholder="inputModal.placeholder" ref="globalInput" class="w-full bg-gray-100 px-3 py-2 rounded-lg border-none outline-none text-sm text-center mt-3 focus:ring-2 focus:ring-blue-100"></div><div class="flex border-t border-gray-100"><button @click="inputModal.show = false" class="flex-1 py-3 text-gray-600 font-medium active:bg-gray-50 text-sm">取消</button><div class="w-px bg-gray-100"></div><button @click="handleInputConfirm" class="flex-1 py-3 text-blue-600 font-bold active:bg-gray-50 text-sm">确定</button></div></div></div></transition>
+    <transition name="scale">
+        <div v-if="inputModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-white w-[80%] max-w-xs rounded-2xl overflow-hidden shadow-2xl transform transition-all">
+                <div class="p-5">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1 text-center">{{ inputModal.title }}</h3>
+                    <p v-if="inputModal.desc" class="text-xs text-gray-500 mb-2 text-center">{{ inputModal.desc }}</p>
+                    <textarea v-if="inputModal.inputType === 'textarea'" v-model="inputModal.value" :placeholder="inputModal.placeholder" ref="globalInput" class="w-full h-32 bg-gray-100 px-3 py-2 rounded-lg border-none outline-none text-sm mt-3 focus:ring-2 focus:ring-blue-100 resize-none"></textarea>
+                    <input v-else v-model="inputModal.value" :placeholder="inputModal.placeholder" ref="globalInput" class="w-full bg-gray-100 px-3 py-2 rounded-lg border-none outline-none text-sm text-center mt-3 focus:ring-2 focus:ring-blue-100" :type="inputModal.inputType || 'text'">
+                </div>
+                <div class="flex border-t border-gray-100">
+                    <button @click="inputModal.show = false" class="flex-1 py-3 text-gray-600 font-medium active:bg-gray-50 text-sm">取消</button>
+                    <div class="w-px bg-gray-100"></div>
+                    <button @click="handleInputConfirm" class="flex-1 py-3 text-blue-600 font-bold active:bg-gray-50 text-sm">确定</button>
+                </div>
+            </div>
+        </div>
+    </transition>
     <transition name="scale"><div v-if="confirmModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[80%] max-w-xs rounded-2xl overflow-hidden shadow-2xl"><div class="p-6 text-center"><h3 class="text-lg font-bold text-gray-900 mb-2">提示</h3><p class="text-sm text-gray-500">{{ confirmModal.message }}</p></div><div class="flex border-t border-gray-100"><button @click="confirmModal.show = false" class="flex-1 py-3 text-gray-600 text-sm">取消</button><div class="w-px bg-gray-100"></div><button @click="handleConfirm" class="flex-1 py-3 text-blue-600 font-bold text-sm">确定</button></div></div></div></transition>
+
+    <!-- 语音输入弹窗 -->
+    <transition name="scale">
+        <div v-if="voiceInputModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-white w-[85%] rounded-[24px] overflow-hidden shadow-2xl p-6 flex flex-col items-center">
+                <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4 text-green-600 text-2xl animate-pulse">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">语音输入</h3>
+                <textarea v-model="voiceInputModal.content" placeholder="输入文字模拟语音..." class="w-full h-24 bg-gray-50 p-3 rounded-xl text-sm border border-gray-100 outline-none resize-none mb-4"></textarea>
+                <div class="flex gap-3 w-full">
+                    <button @click="voiceInputModal.show = false" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm">取消</button>
+                    <button @click="sendVoiceMessage" class="flex-1 py-3 bg-black text-white rounded-xl font-bold text-sm">发送语音</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- 红包填写弹窗 (Red UI) -->
+    <transition name="scale">
+        <div v-if="redPacketModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-[#f3f4f6] w-[85%] rounded-[12px] overflow-hidden shadow-2xl flex flex-col items-center animate-scale-in">
+                <div class="w-full bg-[#ea5f39] p-4 text-center text-[#fce8cd] font-medium text-lg relative">
+                    发红包
+                    <div class="absolute right-4 top-4 text-sm cursor-pointer" @click="redPacketModal.show = false">取消</div>
+                </div>
+                <div class="p-6 w-full space-y-4">
+                    <div class="bg-white rounded-lg p-3 flex items-center">
+                        <span class="text-gray-900 font-medium mr-2">金额</span>
+                        <input type="number" v-model="redPacketModal.amount" placeholder="0.00" class="flex-1 bg-transparent text-right outline-none text-lg font-bold placeholder-gray-300">
+                        <span class="text-gray-900 font-medium ml-2">元</span>
+                    </div>
+                    <div class="bg-white rounded-lg p-3">
+                         <input v-model="redPacketModal.note" placeholder="恭喜发财，大吉大利" class="w-full bg-transparent outline-none text-base">
+                    </div>
+                    <div class="text-center text-3xl font-bold my-4">¥{{ redPacketModal.amount || '0.00' }}</div>
+                    <button @click="sendRedPacket" class="w-full py-3 bg-[#ea5f39] text-[#fce8cd] rounded-lg font-bold text-base shadow-sm active:bg-[#c24e38]">塞钱进红包</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- 转账填写弹窗 -->
+    <transition name="scale">
+        <div v-if="transferModal.show" class="fixed inset-0 z-[60000] flex items-center justify-center bg-white/100">
+            <div class="w-full h-full flex flex-col bg-white">
+                <div class="h-[44px] flex items-center px-4">
+                     <i class="fas fa-chevron-left text-lg cursor-pointer" @click="transferModal.show = false"></i>
+                </div>
+                <div class="p-6 flex flex-col">
+                    <div class="flex items-center gap-4 mb-8">
+                         <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100"><img :src="wechatState.activeSession?.avatar" class="w-full h-full object-cover"></div>
+                         <div>
+                             <div class="font-bold text-lg">{{ wechatState.activeSession?.name }}</div>
+                             <div class="text-gray-400 text-sm">微信号: {{ getCurrentSessionId() }}</div>
+                         </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mb-4">转账金额</div>
+                    <div class="flex items-end gap-2 border-b border-gray-100 pb-2 mb-6">
+                        <span class="text-4xl font-bold">¥</span>
+                        <input type="number" v-model="transferModal.amount" placeholder="" class="flex-1 bg-transparent outline-none text-5xl font-bold h-16">
+                    </div>
+                    <div class="flex items-center justify-between mb-8">
+                         <input v-model="transferModal.note" placeholder="添加转账说明" class="text-sm text-gray-500 bg-transparent outline-none w-full">
+                    </div>
+                    <button @click="sendTransfer" class="w-full py-3.5 bg-[#07c160] text-white rounded-lg font-bold text-base shadow-sm active:opacity-90">转账</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- 亲密付选择弹窗 (入口) -->
+    <transition name="scale">
+        <div v-if="qinmiSelectModal.show" class="fixed inset-0 z-[62000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-white w-[85%] rounded-[24px] overflow-hidden shadow-2xl p-6 flex flex-col items-center">
+                <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4 text-[#d95556] text-3xl">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-6">亲密付</h3>
+                <div class="flex gap-4 w-full">
+                    <button @click="startQinmiProcess('give')" class="flex-1 flex flex-col items-center gap-2 p-4 bg-red-50 rounded-xl active:scale-95 transition">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#d95556] shadow-sm"><i class="fas fa-gift"></i></div>
+                        <span class="font-bold text-sm text-[#d95556]">我给TA开通</span>
+                        <span class="text-[10px] text-gray-400">我为TA买单</span>
+                    </button>
+                    <button @click="startQinmiProcess('ask')" class="flex-1 flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl active:scale-95 transition">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-hand-holding-heart"></i></div>
+                        <span class="font-bold text-sm text-blue-600">求TA帮我开通</span>
+                        <span class="text-[10px] text-gray-400">TA为我买单</span>
+                    </button>
+                </div>
+                <div class="mt-4 text-xs text-gray-400 cursor-pointer" @click="qinmiSelectModal.show = false">取消</div>
+            </div>
+        </div>
+    </transition>
 
     <!-- 消息弹窗 -->
     <transition name="app-slide">
@@ -221,7 +439,7 @@
                     <div @click="bindWorldFolder(null)" class="p-3.5 rounded-xl border border-dashed border-gray-200 text-center text-gray-400 text-xs active:bg-gray-50 mb-2">不绑定 (默认)</div>
                     <div v-for="folder in folders" :key="folder.id" @click="toggleWorldBinding(folder.id)" class="p-3.5 rounded-xl flex items-center justify-between active:bg-gray-50 transition border border-gray-50">
                         <div class="flex items-center gap-3"><i class="fas fa-folder text-yellow-400"></i><span class="font-bold text-sm text-gray-800">{{ folder.name }}</span></div>
-                        <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center transition" :class="isFolderBound(folder.id) ? 'bg-blue-500 border-blue-500' : ''">
+                        <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center transition" :class="isFolderBound(folder.id) ? 'bg-black border-black' : ''">
                             <i v-if="isFolderBound(folder.id)" class="fas fa-check text-white text-xs"></i>
                         </div>
                     </div>
@@ -254,12 +472,15 @@
         <div v-if="forwardModal.show" class="fixed inset-0 z-[70000]">
             <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="forwardModal.show = false"></div>
             <div class="ios-list-modal h-[80vh]">
-                <div class="ios-list-header">转发给... <button class="absolute right-4 text-gray-500 font-normal text-sm" @click="forwardModal.show = false">取消</button></div>
+                <div class="ios-list-header">
+                    {{ forwardModal.mode === 'qinmi' ? '选择好友开通亲密付' : '转发给...' }}
+                    <button class="absolute right-4 text-gray-500 font-normal text-sm" @click="forwardModal.show = false">取消</button>
+                </div>
                 <div class="ios-list-content">
                     <div v-if="wechatState.friendList.length === 0" class="p-8 text-center text-gray-400">暂无联系人</div>
-                    <div v-for="friend in wechatState.friendList" :key="friend.id" class="ios-list-item cursor-pointer" @click="doForward(friend.id)">
+                    <div v-for="friend in wechatState.friendList" :key="friend.id" class="ios-list-item cursor-pointer" @click="handleFriendSelect(friend)">
                         <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden"><img :src="friend.avatar" class="w-full h-full object-cover"></div><span class="text-gray-900 font-bold">{{ friend.remark || friend.name }}</span></div>
-                        <button class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">发送</button>
+                        <button class="bg-black text-white px-3 py-1 rounded text-xs font-bold">{{ forwardModal.mode === 'qinmi' ? '选择' : '发送' }}</button>
                     </div>
                 </div>
             </div>
@@ -286,66 +507,127 @@
         </div>
     </transition>
 
-    <!-- 心声历史记录 -->
+    <!-- 心声历史记录 (增强版：多选+收藏) -->
     <transition name="app-slide">
         <div v-if="statusHistoryModal.show" class="fixed inset-0 z-[61000] bg-gray-50 flex flex-col">
             <div class="h-[60px] px-4 flex items-center justify-between bg-white border-b border-gray-100 pt-safe">
                 <button @click="statusHistoryModal.show = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button>
                 <h1 class="text-md font-bold">心声历史</h1>
-                <div class="w-8"></div>
+                <!-- 多选按钮 -->
+                <button @click="toggleStatusMultiSelect" class="text-sm font-bold text-black" style="width: auto; min-width: 32px;">
+                    {{ isStatusMultiSelectMode ? '完成' : '多选' }}
+                </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
                 <div v-if="!currentStatusHistory || currentStatusHistory.length===0" class="text-center text-gray-400 mt-20 text-xs">暂无历史记录</div>
-                <div v-for="(rec, idx) in currentStatusHistory" :key="idx" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <div class="text-xs text-gray-400 mb-2 border-b border-gray-50 pb-2">{{ formatChatTime(rec.time) }}</div>
-                    <div class="space-y-2 text-xs">
-                        <p><span class="font-bold text-gray-500">心声:</span> {{ rec.thought }}</p>
-                        <p><span class="font-bold text-gray-500">随笔:</span> {{ rec.note }}</p>
+                <div v-for="(rec, idx) in currentStatusHistory" :key="idx" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-3" @click="isStatusMultiSelectMode ? toggleSelectStatus(idx) : null">
+                    <!-- 多选框 -->
+                    <div v-if="isStatusMultiSelectMode" class="self-center">
+                        <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center transition" :class="selectedStatusIndices.includes(idx) ? 'bg-black border-black' : 'bg-white'">
+                            <i v-if="selectedStatusIndices.includes(idx)" class="fas fa-check text-white text-[10px]"></i>
+                        </div>
                     </div>
+                    <div class="flex-1">
+                        <div class="text-xs text-gray-400 mb-2 border-b border-gray-50 pb-2">{{ formatChatTime(rec.time) }}</div>
+                        <div class="space-y-2 text-xs">
+                            <p><span class="font-bold text-gray-500">心声:</span> {{ rec.thought }}</p>
+                            <p><span class="font-bold text-gray-500">随笔:</span> {{ rec.note }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 心声多选操作栏 -->
+            <transition name="app-slide">
+                <div v-if="isStatusMultiSelectMode" class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 h-[60px] pb-safe flex items-center justify-around z-10 shadow-lg">
+                    <button @click="deleteSelectedStatus" class="flex flex-col items-center text-gray-500"><i class="far fa-trash-alt text-lg"></i><span class="text-[10px]">删除</span></button>
+                    <button @click="favoriteSelectedStatus" class="flex flex-col items-center text-gray-500"><i class="fas fa-cube text-lg"></i><span class="text-[10px]">收藏</span></button>
+                </div>
+            </transition>
+        </div>
+    </transition>
+    
+    <!-- 收藏夹弹窗 -->
+    <transition name="app-slide">
+        <div v-if="favoritesModal.show" class="fixed inset-0 z-[75000] bg-gray-50 flex flex-col">
+            <header class="bg-white h-[60px] px-4 flex items-center justify-between border-b border-gray-100 pt-safe sticky top-0">
+                <button @click="favoritesModal.show = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button>
+                <h1 class="text-md font-bold">我的收藏</h1>
+                <div class="w-8"></div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                <div v-if="favorites.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无收藏内容</div>
+                <div v-for="(item, idx) in favorites" :key="idx" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative group">
+                     <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-bold">{{ item.type === 'status' ? '心声' : '聊天' }}</span>
+                            <span class="text-xs font-bold text-gray-700">{{ item.source }}</span>
+                        </div>
+                        <span class="text-[10px] text-gray-300">{{ formatChatTime(item.time) }}</span>
+                     </div>
+                     <div class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{{ item.content }}</div>
+                     <button @click="deleteFavorite(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
                 </div>
             </div>
         </div>
     </transition>
 
-    <transition name="scale"><div v-if="chatWizard.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] h-[70vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white"><button @click="closeChatWizard" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ chatWizard.step === 1 ? '选择我的面具' : (chatWizard.type === 'single' ? '选择好友' : '选择群成员') }}</h3><button v-if="chatWizard.step === 2 && chatWizard.type === 'group'" @click="finishCreateChat" class="text-green-600 font-bold text-sm bg-green-50 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="chatWizard.step === 1"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">没有可用面具，请去"我-面具"添加</div><div v-for="mask in masks" :key="mask.id" @click="selectWizardMask(mask)" class="bg-white border border-gray-100 p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer"><div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"></div><div class="flex-1"><h4 class="font-bold text-sm">{{ mask.name }}</h4><p class="text-xs text-gray-400">{{ mask.bio || '无介绍' }}</p></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div><div v-if="chatWizard.step === 2"><div v-if="wechatState.friendList.length === 0" class="text-center text-gray-400 mt-20 text-xs">通讯录暂无好友</div><div v-for="friend in wechatState.friendList" :key="friend.id" @click="selectWizardContact(friend)" class="bg-white border p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer transition" :class="chatWizard.selectedContacts.includes(friend.id) ? 'border-green-500 bg-green-50' : 'border-gray-100'"><div v-if="chatWizard.type === 'group'" class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center" :class="{'bg-green-500 border-green-500': chatWizard.selectedContacts.includes(friend.id)}"><i v-if="chatWizard.selectedContacts.includes(friend.id)" class="fas fa-check text-white text-[10px]"></i></div><div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden"><img v-if="friend.avatar" :src="friend.avatar" class="w-full h-full object-cover"></div><span class="font-bold text-sm">{{ friend.remark || friend.name }}</span></div></div></div></div></div></transition>
+    <!-- 表情包管理全屏弹窗 -->
+    <transition name="app-slide">
+        <div v-if="showStickerManager" class="fixed inset-0 z-[50000] bg-gray-50 flex flex-col">
+            <header class="bg-white h-[90px] pt-10 px-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-10">
+                <button @click="showStickerManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button>
+                <h1 class="text-[17px] font-bold">表情管理</h1>
+                <div class="flex items-center gap-3">
+                    <button @click="triggerStickerUpload" class="text-black"><i class="fas fa-image text-lg"></i></button>
+                    <button @click="openUrlImportModal" class="text-black"><i class="fas fa-link text-lg"></i></button>
+                    <button @click="toggleStickerMultiSelect" :class="isStickerMultiSelect ? 'text-red-500' : 'text-black'"><i class="fas fa-check-square text-lg"></i></button>
+                </div>
+            </header>
+            
+            <!-- 分组 Tab -->
+            <div class="bg-white px-2 py-2 flex gap-2 overflow-x-auto border-b border-gray-100 scrollbar-hide shrink-0">
+                <div v-for="group in stickerGroups" :key="group.id" 
+                     class="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2"
+                     :class="activeStickerGroupId === group.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'"
+                     @click="handleGroupClick(group)">
+                    {{ group.name }}
+                </div>
+                <div @click="addStickerGroup" class="w-8 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 cursor-pointer shrink-0"><i class="fas fa-plus text-xs"></i></div>
+            </div>
+
+            <!-- 表情列表 -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <div class="grid grid-cols-4 gap-4">
+                    <div v-for="sticker in filteredStickers" :key="sticker.id" 
+                         class="aspect-square rounded-lg bg-white p-2 border border-gray-100 relative shadow-sm flex items-center justify-center"
+                         @click="handleStickerClick(sticker)">
+                        <img :src="sticker.url" class="w-full h-full object-contain">
+                        <!-- 多选勾选框 -->
+                        <div v-if="isStickerMultiSelect" class="absolute top-1 right-1 w-5 h-5 rounded-full border border-gray-300 bg-white flex items-center justify-center" :class="{'bg-black border-black': selectedStickerIds.includes(sticker.id)}">
+                            <i v-if="selectedStickerIds.includes(sticker.id)" class="fas fa-check text-white text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="filteredStickers.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无表情</div>
+            </div>
+
+            <!-- 删除底部栏 -->
+            <div v-if="isStickerMultiSelect" class="bg-white border-t border-gray-100 p-4 pb-safe shadow-lg">
+                <button @click="deleteSelectedStickers" class="w-full bg-red-500 text-white py-3 rounded-xl font-bold text-sm">删除所选 ({{selectedStickerIds.length}})</button>
+            </div>
+
+            <input type="file" ref="stickerUploadInput" accept="image/*" class="hidden" multiple @change="handleStickerUpload">
+        </div>
+    </transition>
+
+    <transition name="scale"><div v-if="chatWizard.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] h-[70vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white"><button @click="closeChatWizard" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ chatWizard.step === 1 ? '选择我的面具' : (chatWizard.type === 'single' ? '选择好友' : '选择群成员') }}</h3><button v-if="chatWizard.step === 2 && chatWizard.type === 'group'" @click="finishCreateChat" class="text-black font-bold text-sm bg-gray-100 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="chatWizard.step === 1"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">没有可用面具，请去"我-面具"添加</div><div v-for="mask in masks" :key="mask.id" @click="selectWizardMask(mask)" class="bg-white border border-gray-100 p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer"><div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"></div><div class="flex-1"><h4 class="font-bold text-sm">{{ mask.name }}</h4><p class="text-xs text-gray-400">{{ mask.bio || '无介绍' }}</p></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div><div v-if="chatWizard.step === 2"><div v-if="wechatState.friendList.length === 0" class="text-center text-gray-400 mt-20 text-xs">通讯录暂无好友</div><div v-for="friend in wechatState.friendList" :key="friend.id" @click="selectWizardContact(friend)" class="bg-white border p-3 rounded-xl flex items-center gap-3 active:bg-gray-50 cursor-pointer transition" :class="chatWizard.selectedContacts.includes(friend.id) ? 'border-black bg-gray-50' : 'border-gray-100'"><div v-if="chatWizard.type === 'group'" class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center" :class="{'bg-black border-black': chatWizard.selectedContacts.includes(friend.id)}"><i v-if="chatWizard.selectedContacts.includes(friend.id)" class="fas fa-check text-white text-[10px]"></i></div><div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden"><img v-if="friend.avatar" :src="friend.avatar" class="w-full h-full object-cover"></div><span class="font-bold text-sm">{{ friend.remark || friend.name }}</span></div></div></div></div></div></transition>
 
     <!-- 世界书添加/编辑文件 Modal (iOS UI) -->
     <transition name="scale"><div v-if="worldModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] rounded-[24px] overflow-hidden shadow-2xl p-6 space-y-4"><h3 class="text-lg font-bold text-center text-gray-900">{{ worldModal.id ? '编辑文件' : (worldModal.type === 'folder' ? '新建文件夹' : '新建文件') }}</h3><input v-model="worldModal.name" placeholder="请输入名称" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><div v-if="worldModal.type === 'file'" class="space-y-4"><div class="space-y-1"><label class="text-xs text-gray-500 ml-1">归类文件夹</label><div @click="folderSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 flex justify-between items-center cursor-pointer text-gray-700"><span :class="worldModal.parentId ? 'text-black' : 'text-gray-400'">{{ getFolderName(worldModal.parentId) }}</span><i class="fas fa-chevron-right text-xs text-gray-300"></i></div></div><textarea v-model="worldModal.content" placeholder="输入文件内容..." class="w-full bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none h-32 resize-none"></textarea></div><div class="flex gap-3 pt-2"><button @click="worldModal.show = false" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">取消</button><button @click="saveWorldItem" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm">保存</button></div></div></div></transition>
-    <transition name="scale"><div v-if="addContactModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] max-h-[85vh] rounded-[24px] overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10"><button @click="addContactModal.show = false" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ newContact.id ? '编辑朋友' : '添加朋友' }}</h3><button @click="saveNewContact" class="text-green-600 font-bold text-sm bg-green-50 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-6 space-y-5"><div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative cursor-pointer active:opacity-70 transition" @click="triggerAddContactAvatar"><img v-if="newContact.avatar" :src="newContact.avatar" class="w-full h-full object-cover"><div v-else class="flex flex-col items-center text-gray-400"><i class="fas fa-camera text-2xl mb-1"></i><span class="text-[10px]">上传头像</span></div></div></div><div class="space-y-4"><div><label class="text-xs text-gray-500 ml-1 mb-1 block">姓名</label><input v-model="newContact.name" placeholder="输入姓名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">备注</label><input v-model="newContact.remark" placeholder="输入备注名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">网名 (ID)</label><input v-model="newContact.username" placeholder="输入网名/微信号" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">性别</label><div class="flex gap-3"><div @click="newContact.gender = '男'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='男'?'bg-blue-50 border-blue-200 text-blue-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-mars"></i> 男</div><div @click="newContact.gender = '女'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='女'?'bg-pink-50 border-pink-200 text-pink-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-venus"></i> 女</div></div></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">拍一拍</label><input v-model="newContact.nudge" placeholder="拍一拍后缀" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">个性签名</label><input v-model="newContact.signature" placeholder="输入个性签名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">背景资料</label><textarea v-model="newContact.bio" placeholder="输入人设、背景故事..." class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none h-24 resize-none"></textarea></div></div></div><input type="file" ref="addContactAvatarInput" accept="image/*" class="hidden" @change="handleAddContactAvatar"></div></div></transition>
+    <transition name="scale"><div v-if="addContactModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] max-h-[85vh] rounded-[24px] overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10"><button @click="addContactModal.show = false" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ newContact.id ? '编辑朋友' : '添加朋友' }}</h3><button @click="saveNewContact" class="text-black font-bold text-sm bg-gray-100 px-3 py-1 rounded-lg">完成</button></div><div class="flex-1 overflow-y-auto p-6 space-y-5"><div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative cursor-pointer active:opacity-70 transition" @click="triggerAddContactAvatar"><img v-if="newContact.avatar" :src="newContact.avatar" class="w-full h-full object-cover"><div v-else class="flex flex-col items-center text-gray-400"><i class="fas fa-camera text-2xl mb-1"></i><span class="text-[10px]">上传头像</span></div></div></div><div class="space-y-4"><div><label class="text-xs text-gray-500 ml-1 mb-1 block">姓名</label><input v-model="newContact.name" placeholder="输入姓名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">备注</label><input v-model="newContact.remark" placeholder="输入备注名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">网名 (ID)</label><input v-model="newContact.username" placeholder="输入网名/微信号" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">性别</label><div class="flex gap-3"><div @click="newContact.gender = '男'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='男'?'bg-blue-50 border-blue-200 text-blue-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-mars"></i> 男</div><div @click="newContact.gender = '女'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="newContact.gender==='女'?'bg-pink-50 border-pink-200 text-pink-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-venus"></i> 女</div></div></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">拍一拍</label><input v-model="newContact.nudge" placeholder="拍一拍后缀" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">个性签名</label><input v-model="newContact.signature" placeholder="输入个性签名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">背景资料</label><textarea v-model="newContact.bio" placeholder="输入人设、背景故事..." class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none h-24 resize-none"></textarea></div></div></div><input type="file" ref="addContactAvatarInput" accept="image/*" class="hidden" @change="handleAddContactAvatar"></div></div></transition>
 
-    <!-- 面具管理 Modal (Z-Index 50000) -->
-    <transition name="scale"><div v-if="showMaskManager" class="fixed inset-0 z-[50000] bg-gray-50 flex flex-col"><div class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100"><button @click.stop="showMaskManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button><h1 class="text-[17px] font-bold">我的面具</h1><button @click="openMaskEditor(null)" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-plus"></i></button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无面具，请点击右上角添加</div><div v-for="mask in masks" :key="mask.id" @click="openMaskEditor(mask)" class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-100 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"><i v-else class="fas fa-mask flex h-full items-center justify-center text-purple-300 text-xl"></i></div><div><h3 class="font-bold text-gray-900">{{ mask.name }}</h3><p class="text-xs text-gray-400 line-clamp-1">{{ mask.bio || '暂无介绍' }}</p></div></div></div></div></transition>
-    
-    <!-- 面具编辑 Modal -->
-    <transition name="scale">
-        <div v-if="maskModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div class="bg-white w-[90%] max-h-[85vh] rounded-[24px] overflow-hidden shadow-2xl flex flex-col animate-scale-in">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
-                    <button @click="maskModal.show = false" class="text-gray-500 font-medium text-sm">取消</button>
-                    <h3 class="font-bold text-lg text-gray-900">{{ maskForm.id ? '编辑面具' : '新建面具' }}</h3>
-                    <button @click="saveMask" class="text-purple-600 font-bold text-sm bg-purple-50 px-3 py-1 rounded-lg">保存</button>
-                </div>
-                <div class="flex-1 overflow-y-auto p-6 space-y-5">
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative cursor-pointer active:opacity-70 transition" @click="triggerMaskAvatar">
-                            <img v-if="maskForm.avatar" :src="maskForm.avatar" class="w-full h-full object-cover">
-                            <div v-else class="flex flex-col items-center text-gray-400"><i class="fas fa-mask text-2xl mb-1"></i><span class="text-[10px]">面具头像</span></div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">姓名</label><input v-model="maskForm.name" placeholder="输入姓名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div>
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">网名 (ID)</label><input v-model="maskForm.username" placeholder="输入ID" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div>
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">性别</label><div class="flex gap-3"><div @click="maskForm.gender = '男'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="maskForm.gender==='男'?'bg-blue-50 border-blue-200 text-blue-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-mars"></i> 男</div><div @click="maskForm.gender = '女'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="maskForm.gender==='女'?'bg-pink-50 border-pink-200 text-pink-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-venus"></i> 女</div></div></div>
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">拍一拍</label><input v-model="maskForm.nudge" placeholder="拍一拍后缀" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div>
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">个性签名</label><input v-model="maskForm.signature" placeholder="输入个性签名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div>
-                        <div><label class="text-xs text-gray-500 ml-1 mb-1 block">背景资料</label><textarea v-model="maskForm.bio" placeholder="人设背景..." class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none h-24 resize-none"></textarea></div>
-                    </div>
-                    <button v-if="maskForm.id" @click="deleteMask(maskForm.id)" class="w-full py-3 text-red-500 bg-red-50 rounded-xl font-bold text-sm">删除此面具</button>
-                </div>
-                <input type="file" ref="maskAvatarInput" accept="image/*" class="hidden" @change="handleMaskAvatar">
-            </div>
-        </div>
-    </transition>
+    <!-- 面具添加/编辑弹窗 (Updated: 必须和 Contact Form 一致) -->
+    <transition name="scale"><div v-if="maskModal.show" class="fixed inset-0 z-[55000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[90%] max-h-[85vh] rounded-[24px] overflow-hidden shadow-2xl flex flex-col animate-scale-in"><div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10"><button @click="maskModal.show = false" class="text-gray-500 font-medium text-sm">取消</button><h3 class="font-bold text-lg text-gray-900">{{ maskForm.id ? '编辑面具' : '新建面具' }}</h3><button @click="saveMask" class="text-black font-bold text-sm bg-gray-100 px-3 py-1 rounded-lg">保存</button></div><div class="flex-1 overflow-y-auto p-6 space-y-5"><div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative cursor-pointer active:opacity-70 transition" @click="triggerMaskAvatar"><img v-if="maskForm.avatar" :src="maskForm.avatar" class="w-full h-full object-cover"><div v-else class="flex flex-col items-center text-gray-400"><i class="fas fa-camera text-2xl mb-1"></i><span class="text-[10px]">上传头像</span></div></div></div><div class="space-y-4"><div><label class="text-xs text-gray-500 ml-1 mb-1 block">姓名</label><input v-model="maskForm.name" placeholder="输入姓名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">备注</label><input v-model="maskForm.remark" placeholder="输入备注名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">网名 (ID)</label><input v-model="maskForm.username" placeholder="输入网名/微信号" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">性别</label><div class="flex gap-3"><div @click="maskForm.gender = '男'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="maskForm.gender==='男'?'bg-blue-50 border-blue-200 text-blue-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-mars"></i> 男</div><div @click="maskForm.gender = '女'" class="flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition" :class="maskForm.gender==='女'?'bg-pink-50 border-pink-200 text-pink-600':'bg-white border-gray-200 text-gray-500'"><i class="fas fa-venus"></i> 女</div></div></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">拍一拍</label><input v-model="maskForm.nudge" placeholder="拍一拍后缀" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">个性签名</label><input v-model="maskForm.signature" placeholder="输入个性签名" class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none"></div><div><label class="text-xs text-gray-500 ml-1 mb-1 block">背景资料</label><textarea v-model="maskForm.bio" placeholder="输入人设、背景故事..." class="w-full bg-gray-50 px-4 py-3 rounded-xl text-sm border border-gray-200 outline-none h-24 resize-none"></textarea></div><div v-if="maskForm.id" class="pt-4"><button @click="deleteMask(maskForm.id)" class="w-full py-3 text-red-500 bg-red-50 rounded-xl font-bold text-sm">删除此面具</button></div></div></div><input type="file" ref="maskAvatarInput" accept="image/*" class="hidden" @change="handleMaskAvatar"></div></div></transition>
 
     <!-- 状态栏 -->
     <transition name="fade">
@@ -380,7 +662,7 @@
         <div v-if="currentApp === 'wechat'" class="absolute inset-0 z-[1000] bg-[#f7f7f7] flex flex-col overflow-hidden text-black" @click="closeChatMenus">
             
             <!-- 头部 -->
-            <header v-if="wechatState.activeNav !== 'room' && wechatState.activeNav !== 'chat-details'" class="h-[90px] pt-10 px-4 flex items-center justify-between sticky top-0 z-[60] bg-[#f7f7f7]">
+            <header v-if="wechatState.activeNav !== 'room' && wechatState.activeNav !== 'chat-details' && wechatState.activeNav !== 'chat-bg-settings' && wechatState.activeNav !== 'red-packet-detail' && wechatState.activeNav !== 'wallet' && wechatState.activeNav !== 'qinmi-manage' && wechatState.activeNav !== 'qinmi-specific-detail' && wechatState.activeNav !== 'moments'" class="h-[90px] pt-10 px-4 flex items-center justify-between sticky top-0 z-[60] bg-[#f7f7f7]">
                 <button @click="closeApp" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-times text-lg"></i></button>
                 <h1 class="text-[17px] font-medium">{{ wechatState.activeNav === 'contacts' ? '通讯录' : (wechatState.activeNav === 'discover' ? '发现' : (wechatState.activeNav === 'me' ? '' : '微信')) }}</h1>
                 <div class="w-8 flex justify-end relative">
@@ -394,9 +676,174 @@
                 </div>
             </header>
 
+            <!-- 钱包页面 (新) -->
+            <div v-if="wechatState.activeNav === 'wallet'" class="flex-1 flex flex-col bg-white absolute inset-0 z-50">
+                <header class="h-[90px] pt-10 px-4 flex items-center bg-white"><button @click="wechatState.activeNav = 'me'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2">钱包</h1></header>
+                <div class="flex-1 overflow-y-auto">
+                    <div class="bg-gray-800 m-4 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="text-sm opacity-80 mb-2">总资产(元)</div>
+                        <div class="text-4xl font-bold font-mono tracking-tight mb-8">¥ {{ formatMoney(wallet.balance) }}</div>
+                        <div class="flex gap-4">
+                            <button @click="triggerTopUp" class="flex-1 bg-white text-black py-3 rounded-xl font-bold text-sm">充值</button>
+                            <button @click="triggerWithdraw" class="flex-1 bg-white/20 backdrop-blur-sm text-white py-3 rounded-xl font-bold text-sm">提现</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 亲密付入口 -->
+                    <div class="px-4 mb-4">
+                        <div class="bg-[#d95556] rounded-xl p-4 text-white flex justify-between items-center cursor-pointer shadow-md" @click="openQinmiSelectModal">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-heart text-lg"></i></div>
+                                <div><div class="font-bold">亲密付</div><div class="text-xs opacity-80">赠送与求助</div></div>
+                            </div>
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4">
+                         <!-- 查看已有的亲密付关系 -->
+                         <div @click="openQinmiManage" class="flex justify-between items-center bg-gray-50 p-4 rounded-xl mb-6 cursor-pointer">
+                             <span class="font-bold">查看我的亲密付关系</span>
+                             <i class="fas fa-chevron-right text-gray-300"></i>
+                         </div>
+
+                        <h3 class="font-bold text-lg mb-4 text-gray-900">账单明细</h3>
+                        <div class="space-y-4">
+                            <div v-if="wallet.transactions.length === 0" class="text-center text-gray-400 text-xs py-10">暂无交易记录</div>
+                            <div v-for="(tx, idx) in wallet.transactions" :key="idx" class="flex justify-between items-center pb-4 border-b border-gray-50 last:border-0">
+                                <div>
+                                    <div class="font-bold text-gray-900 text-sm">{{ tx.desc }}</div>
+                                    <div class="text-xs text-gray-400 mt-1">{{ formatChatTime(tx.time) }} · {{ tx.source }}</div>
+                                </div>
+                                <div class="font-bold text-sm font-mono" :class="tx.type === 'income' ? 'text-green-600' : 'text-black'">{{ tx.type === 'income' ? '+' : '-' }}{{ formatMoney(tx.amount) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 亲密付管理页 (列表) -->
+            <div v-if="wechatState.activeNav === 'qinmi-manage'" class="flex-1 flex flex-col qinmi-detail-bg absolute inset-0 z-50">
+                 <header class="h-[90px] pt-10 px-4 flex items-center bg-white"><button @click="wechatState.activeNav = 'wallet'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2 text-black">我的亲密付</h1></header>
+                 <div class="flex-1 overflow-y-auto p-4">
+                     <div v-if="wallet.intimatePays.length === 0" class="text-center text-gray-400 mt-10">暂无亲密付关系</div>
+                     <div v-for="qp in wallet.intimatePays" :key="qp.id" @click="openQinmiSpecificDetail(qp)" class="qinmi-card bg-white p-4 rounded-xl mb-4 cursor-pointer shadow-sm relative overflow-hidden">
+                         <div class="absolute top-0 left-0 w-1 h-full" :class="qp.type === 'outcome' ? 'bg-[#d95556]' : 'bg-blue-500'"></div>
+                         <div class="flex justify-between items-center">
+                             <div class="flex items-center gap-3">
+                                 <div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden"><img :src="getFriendAvatar(qp.targetId)" class="w-full h-full object-cover"></div>
+                                 <div>
+                                     <div class="font-bold text-sm">{{ qp.type === 'outcome' ? '我为TA付' : 'TA为我付' }} <span class="text-gray-500 font-normal">({{ getFriendName(qp.targetId) }})</span></div>
+                                     <div class="text-xs text-gray-400 mt-1">额度: ¥{{ qp.limit }}</div>
+                                 </div>
+                             </div>
+                             <div class="text-xs px-2 py-1 rounded" :class="qp.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'">{{ qp.status === 'active' ? '使用中' : (qp.status === 'rejected' ? '已拒绝' : '待确认') }}</div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- 亲密付单详情页 -->
+            <div v-if="wechatState.activeNav === 'qinmi-specific-detail'" class="flex-1 flex flex-col qinmi-detail-bg absolute inset-0 z-50">
+                <header class="h-[90px] pt-10 px-4 flex items-center bg-white"><button @click="wechatState.activeNav = 'qinmi-manage'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2 text-black">详情</h1></header>
+                <div class="flex-1 overflow-y-auto" v-if="activeQinmiDetail">
+                    <div class="qinmi-card-detail">
+                        <div class="qinmi-card-header">
+                            <div>
+                                <div class="text-sm text-gray-500">{{ activeQinmiDetail.type === 'outcome' ? '本月我已帮TA消费' : '本月TA已帮我消费' }}</div>
+                                <div class="qinmi-balance-big">¥{{ activeQinmiDetail.balanceUsed }}</div>
+                            </div>
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md"><img :src="getFriendAvatar(activeQinmiDetail.targetId)" class="w-full h-full object-cover"></div>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2"><span class="text-gray-500">每月限额</span><span class="font-bold">¥{{ activeQinmiDetail.limit }}</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">剩余额度</span><span class="font-bold text-green-600">¥{{ (activeQinmiDetail.limit - activeQinmiDetail.balanceUsed).toFixed(2) }}</span></div>
+                    </div>
+                    
+                    <div class="px-4 pb-4">
+                        <div class="text-xs font-bold text-gray-400 mb-2 px-2">消费明细</div>
+                        <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+                            <div v-if="!activeQinmiDetail.history || activeQinmiDetail.history.length === 0" class="text-center text-gray-300 text-xs py-6">暂无消费</div>
+                            <div v-for="(h, hi) in activeQinmiDetail.history" :key="hi" class="flex justify-between items-center p-4 border-b border-gray-50 last:border-0">
+                                <div>
+                                    <div class="text-sm font-bold">{{ h.item }}</div>
+                                    <div class="text-xs text-gray-400 mt-1">{{ formatChatTime(h.time) }}</div>
+                                </div>
+                                <div class="font-bold text-sm">-{{ h.amount }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 朋友圈 (Moments) -->
+            <div v-if="wechatState.activeNav === 'moments'" class="flex-1 flex flex-col bg-white absolute inset-0 z-50 overflow-y-auto">
+                <div class="absolute top-0 left-0 w-full h-[90px] pt-10 px-4 flex justify-between items-center z-10 text-white drop-shadow-md">
+                    <button @click="wechatState.activeNav='discover'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg"></i></button>
+                    <button @click="openPublishMoment" class="w-8 h-8 flex items-center justify-center bg-black/20 rounded-full backdrop-blur-sm"><i class="fas fa-camera text-lg"></i></button>
+                </div>
+                
+                <div class="moments-header">
+                    <img v-if="homeProfile.avatar" :src="homeProfile.avatar" class="moments-cover opacity-50 blur-sm">
+                    <div v-else class="w-full h-full bg-gray-800"></div>
+                    <div class="moments-user">
+                        <div class="moments-username">{{ homeProfile.name }}</div>
+                        <div class="moments-avatar"><img v-if="homeProfile.avatar" :src="homeProfile.avatar" class="w-full h-full object-cover"></div>
+                    </div>
+                </div>
+
+                <div class="pb-20">
+                    <div v-if="moments.length === 0" class="text-center text-gray-400 text-sm mt-10">暂无动态，点击右上角发布</div>
+                    <div v-for="moment in moments" :key="moment.id" class="moment-item">
+                        <div class="moment-avatar"><img :src="moment.avatar" class="w-full h-full object-cover"></div>
+                        <div class="moment-content">
+                            <div class="moment-name">{{ moment.name }}</div>
+                            <div class="moment-text">{{ moment.content }}</div>
+                            <div v-if="moment.images && moment.images.length > 0" class="moment-images">
+                                <img v-for="(img, idx) in moment.images" :key="idx" :src="img" class="moment-image" :class="moment.images.length===1?'single':''">
+                            </div>
+                            <div class="moment-meta">
+                                <div class="moment-time">{{ formatChatTime(moment.time) }}</div>
+                                <div class="moment-action cursor-pointer" @click="toggleLike(moment)"><i class="far fa-heart" :class="moment.isLiked?'text-red-500 fas':'far'"></i></div>
+                            </div>
+                            <div v-if="moment.likes.length > 0 || moment.comments.length > 0" class="moment-likes-comments">
+                                <div v-if="moment.likes.length > 0" class="moment-likes">
+                                    <i class="far fa-heart text-xs"></i> <span>{{ moment.likes.join(', ') }}</span>
+                                </div>
+                                <div v-for="(cmt, cidx) in moment.comments" :key="cidx" class="moment-comment-item">
+                                    <span class="moment-comment-user">{{ cmt.user }}:</span> <span class="text-gray-600">{{ cmt.text }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 发布朋友圈弹窗 -->
+            <transition name="app-slide">
+                <div v-if="showPublishMoment" class="fixed inset-0 z-[70000] bg-white flex flex-col">
+                    <div class="h-[90px] pt-10 px-4 flex justify-between items-center border-b border-gray-100">
+                        <button @click="showPublishMoment = false" class="text-sm font-bold">取消</button>
+                        <button @click="publishMoment" class="px-4 py-1.5 bg-[#07c160] text-white rounded-md text-sm font-bold" :disabled="!newMoment.content && newMoment.images.length===0" :class="(!newMoment.content && newMoment.images.length===0)?'opacity-50':''">发表</button>
+                    </div>
+                    <div class="p-6">
+                        <textarea v-model="newMoment.content" placeholder="这一刻的想法..." class="w-full h-32 text-base outline-none resize-none mb-4"></textarea>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div v-for="(img, idx) in newMoment.images" :key="idx" class="aspect-square bg-gray-100 relative rounded-lg overflow-hidden">
+                                <img :src="img" class="w-full h-full object-cover">
+                                <div class="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white text-xs cursor-pointer" @click="newMoment.images.splice(idx,1)"><i class="fas fa-times"></i></div>
+                            </div>
+                            <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer active:bg-gray-200" @click="$refs.momentImgInput.click()">
+                                <i class="fas fa-plus text-2xl"></i>
+                            </div>
+                        </div>
+                        <input type="file" ref="momentImgInput" accept="image/*" class="hidden" multiple @change="handleMomentImgUpload">
+                    </div>
+                </div>
+            </transition>
+
             <!-- 聊天房间 (Chat Room) -->
             <div v-if="wechatState.activeNav === 'room'" class="flex-1 flex flex-col bg-[#fdfdfd] absolute inset-0 z-20">
-                <header class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100">
+                <header class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white/95 backdrop-blur border-b border-gray-100 z-30">
                     <button @click="wechatState.activeNav = 'chat'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-gray-800"></i></button>
                     <!-- 点击标题显示心声 -->
                     <div class="flex flex-col items-center cursor-pointer active:opacity-50" @click="openStatusModal">
@@ -409,7 +856,9 @@
                     <button class="w-8 h-8 flex items-center justify-center text-gray-800" @click="goToChatDetails"><i class="fas fa-ellipsis-h"></i></button>
                 </header>
                 
-                <div class="flex-1 overflow-y-auto p-4 space-y-5 bg-[#fdfdfd]" ref="chatContainer" @click="closeChatMenus">
+                <!-- 聊天容器：支持自定义背景图 -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-5 bg-[#fdfdfd] bg-cover bg-center" ref="chatContainer" @click="closeChatMenus"
+                     :style="{ backgroundImage: wechatState.activeSession.wallpaper ? 'url(' + wechatState.activeSession.wallpaper + ')' : '' }">
                     <div v-if="wechatState.activeSession.messages.length === 0" class="text-center text-xs text-gray-300 py-4">星期日 13:42</div>
                     
                     <div v-for="(msg, i) in wechatState.activeSession.messages" :key="i">
@@ -417,51 +866,226 @@
                         <div v-if="!msg.isRecalled" class="flex w-full gap-3 mb-2" :class="msg.isSelf ? 'flex-row-reverse' : 'flex-row'" @contextmenu.prevent="showChatContextMenu($event, msg, i)" @touchstart="longPressStart($event, msg, i)" @touchend="longPressEnd">
                             <!-- 复选框 -->
                             <div v-if="isMultiSelectMode" class="self-center" @click.stop="toggleSelectMessage(msg)">
-                                <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center transition" :class="selectedMessageIds.includes(msg) ? 'bg-green-500 border-green-500' : 'bg-white'">
+                                <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center transition" :class="selectedMessageIds.includes(msg) ? 'bg-black border-black' : 'bg-white'">
                                     <i v-if="selectedMessageIds.includes(msg)" class="fas fa-check text-white text-[10px]"></i>
                                 </div>
                             </div>
                             
                             <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-100" @touchstart="longPressStart($event, msg, i)" @touchend="longPressEnd" @contextmenu.prevent="showChatContextMenu($event, msg, i)"><img :src="msg.avatar" class="w-full h-full object-cover"></div>
                             <div class="flex flex-col max-w-[70%]" :class="msg.isSelf ? 'items-end' : 'items-start'">
-                                <div class="chat-bubble" :class="msg.isSelf ? 'chat-bubble-user' : 'chat-bubble-ai'" @touchstart="longPressStart($event, msg, i)" @touchend="longPressEnd" @contextmenu.prevent="showChatContextMenu($event, msg, i)">
+                                <!-- 语音气泡：动态宽度 -->
+                                <div class="chat-bubble" :class="[msg.isSelf ? 'chat-bubble-user' : 'chat-bubble-ai', msg.type === 'voice' ? 'chat-bubble-voice' : '', msg.type === 'image' || msg.type === 'fake_image' ? 'chat-bubble-image' : '', msg.type === 'red_packet' || msg.type === 'transfer' ? 'chat-bubble-finance' : '', msg.type === 'transfer' ? 'chat-bubble-transfer' : '', msg.type === 'red_packet' ? 'chat-bubble-redpacket' : '', msg.type === 'qinmi_invite' ? 'chat-bubble-qinmi' : '', msg.isReceived ? 'received' : '']" 
+                                     :style="msg.type === 'voice' ? { width: (60 + Math.min(msg.duration, 60) * 4) + 'px' } : {}"
+                                     @click="handleChatBubbleClick(msg)"
+                                     @touchstart="longPressStart($event, msg, i)" @touchend="longPressEnd" @contextmenu.prevent="showChatContextMenu($event, msg, i)">
                                     <div v-if="msg.quote" class="quote-block"><span class="font-bold mr-1">{{ msg.quote.name }}:</span>{{ msg.quote.content }}</div>
-                                    <div v-if="msg.type === 'forward'" class="forward-card">
+                                    
+                                    <!-- 语音消息 (改进版：声波竖条) -->
+                                    <div v-if="msg.type === 'voice'" class="flex items-center justify-between w-full">
+                                        <div class="voice-wave-container" :class="msg.isSelf ? 'order-last' : ''">
+                                            <div class="voice-wave-bar"></div>
+                                            <div class="voice-wave-bar"></div>
+                                            <div class="voice-wave-bar"></div>
+                                        </div>
+                                        <span class="font-bold text-xs whitespace-nowrap">{{ msg.duration }}"</span>
+                                        <div v-if="!msg.isSelf && !msg.isRead" class="w-2 h-2 rounded-full bg-red-500 ml-1"></div>
+                                    </div>
+                                    <!-- 图片消息 (Vision Support) -->
+                                    <img v-else-if="msg.type === 'image'" :src="msg.content" class="block">
+                                    <!-- 灰色图片 (Fake Image - Click to Reveal) -->
+                                    <div v-else-if="msg.type === 'fake_image'" class="chat-bubble-fake-image">
+                                        <transition name="fade">
+                                            <div v-if="msg.isRevealed" class="fake-image-text">{{ msg.content }}</div>
+                                        </transition>
+                                    </div>
+                                    <!-- 红包消息 (Updated UI) -->
+                                    <div v-else-if="msg.type === 'red_packet'" class="finance-content-wrapper">
+                                        <div class="finance-content">
+                                            <div class="redpacket-icon-box finance-icon-box"><i class="fas fa-wallet"></i></div>
+                                            <div class="finance-text"><div class="finance-title">{{ msg.note || '恭喜发财，大吉大利' }}</div><div class="finance-desc" v-if="msg.isSelf">查看红包</div></div>
+                                        </div>
+                                        <div class="finance-footer">微信红包</div>
+                                    </div>
+                                    <!-- 转账消息 (Updated UI) -->
+                                    <div v-else-if="msg.type === 'transfer'" class="finance-content-wrapper">
+                                        <div class="finance-content">
+                                            <div class="finance-icon-box"><i class="fas fa-exchange-alt"></i></div>
+                                            <div class="finance-text"><div class="finance-title">¥{{ msg.amount }}</div><div class="finance-desc">{{ msg.isReceived ? '已收款' : (msg.isSelf ? '等待对方收款' : '转账给你') }}</div></div>
+                                        </div>
+                                        <div class="finance-footer">微信转账</div>
+                                    </div>
+                                    <!-- 亲密付邀请 (Updated UI) -->
+                                    <div v-else-if="msg.type === 'qinmi_invite'" class="qinmi-content-wrapper">
+                                        <div class="qinmi-header">
+                                            <i class="fas fa-heart qinmi-icon"></i>
+                                            <span class="font-bold">{{ msg.inviteType === 'give' ? '亲密付' : '亲密付求助' }}</span>
+                                        </div>
+                                        <div class="qinmi-body">
+                                            {{ msg.inviteType === 'give' ? '我想为你开通亲密付' : '能帮我开通亲密付吗？' }}
+                                        </div>
+                                        <div class="qinmi-footer">
+                                            <span>微信亲密付</span>
+                                            <i class="fas fa-chevron-right text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <!-- 转发卡片 -->
+                                    <div v-else-if="msg.type === 'forward'" class="forward-card">
                                         <div class="forward-title">聊天记录</div>
                                         <div class="forward-content">{{ msg.content }}</div>
                                     </div>
+                                    <!-- 文本消息 -->
                                     <span v-else>{{ msg.content }}</span>
                                 </div>
-                                <span class="chat-timestamp-small">{{ formatChatTime(msg.time) }} Read</span>
+                                <!-- 语音转文字展开 -->
+                                <div v-if="msg.type === 'voice' && msg.isExpanded" class="voice-transcription">{{ msg.content }}</div>
+                                <span class="chat-timestamp-small" :class="wechatState.activeSession.wallpaper ? 'text-white/60 drop-shadow-sm' : 'text-gray-300'">{{ formatChatTime(msg.time) }} Read</span>
                             </div>
                         </div>
-                        <!-- 撤回提示 -->
+                        <!-- 撤回提示 (旁白弹窗) -->
                         <div v-else class="system-recall-tip">
-                            {{ msg.isSelf ? '你' : wechatState.activeSession.name }} 撤回了一条消息
-                            <span v-if="!msg.isSelf" class="recall-link" @click="viewRecalled(msg)"></span>
+                            <div class="bg-gray-100/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-500 shadow-sm flex items-center gap-2">
+                                <span>{{ msg.isSelf ? '你' : wechatState.activeSession.name }} 撤回了一条消息</span>
+                                <span v-if="!msg.isSelf" class="text-blue-600 font-bold cursor-pointer hover:underline" @click="viewRecalled(msg)">查看</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 聊天输入区域 -->
                 <div class="bg-white border-t border-gray-100 pb-safe relative">
+                    <!-- 附件菜单 (全新网格布局) -->
+                    <transition name="app-slide">
+                        <div v-if="wechatState.showAttachMenu" class="chat-attach-menu">
+                            <!-- 功能图标项 (全部灰色) -->
+                            <!-- 相册 (支持 Vision) -->
+                            <div class="attach-item" @click="triggerImageUpload"><div class="attach-icon-box"><i class="fas fa-images text-gray-600"></i></div><span class="attach-label">相册</span></div>
+                            <!-- 拍摄 (文字转灰色图) -->
+                            <div class="attach-item" @click="openFakeImageInput"><div class="attach-icon-box"><i class="fas fa-camera text-gray-600"></i></div><span class="attach-label">拍摄</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-video text-gray-600"></i></div><span class="attach-label">视频通话</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-map-marker-alt text-gray-600"></i></div><span class="attach-label">位置</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-phone text-gray-600"></i></div><span class="attach-label">语音通话</span></div>
+                            <!-- 自定义灰色红包图标 (Cute Rounded - Swapped Colors) -->
+                            <div class="attach-item" @click="openRedPacketModal"><div class="attach-icon-box !bg-white border border-gray-200 text-gray-600 !rounded-2xl">
+                                <i class="fas fa-wallet text-lg"></i>
+                            </div><span class="attach-label">红包</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-gift text-gray-600"></i></div><span class="attach-label">礼物</span></div>
+                            <div class="attach-item" @click="openTransferModal"><div class="attach-icon-box"><i class="fas fa-money-bill-wave text-gray-600"></i></div><span class="attach-label">转账</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-cube text-gray-600"></i></div><span class="attach-label">收藏</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-music text-gray-600"></i></div><span class="attach-label">一起听</span></div>
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-book-open text-gray-600"></i></div><span class="attach-label">一起读</span></div>
+                            <!-- 线下模式 (灰色咖啡杯) -->
+                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-coffee text-gray-600"></i></div><span class="attach-label">线下模式</span></div>
+                        </div>
+                    </transition>
+
+                    <!-- 表情面板 -->
+                    <transition name="app-slide">
+                        <div v-if="showStickerPanel" class="h-64 bg-gray-50 border-t border-gray-200 flex flex-col absolute bottom-full w-full z-20 shadow-xl rounded-t-2xl overflow-hidden">
+                            <!-- 分组栏 -->
+                            <div class="bg-white px-2 py-2 flex gap-2 overflow-x-auto border-b border-gray-100 scrollbar-hide shrink-0">
+                                <div v-for="group in stickerGroups" :key="group.id" 
+                                     class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2"
+                                     :class="activeStickerGroupId === group.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'"
+                                     @click="activeStickerGroupId = group.id">
+                                    {{ group.name }}
+                                </div>
+                            </div>
+                            <!-- 表情列表 -->
+                            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-4 gap-4 content-start">
+                                <div v-for="sticker in getStickersForPanel()" :key="sticker.id" class="aspect-square flex items-center justify-center active:scale-90 transition cursor-pointer" @click="sendSticker(sticker)">
+                                    <img :src="sticker.url" class="w-full h-full object-contain">
+                                </div>
+                                <div v-if="getStickersForPanel().length === 0" class="col-span-4 text-center text-gray-400 text-xs mt-10">暂无表情，请去"我-表情"添加</div>
+                            </div>
+                        </div>
+                    </transition>
+
                     <!-- 多选操作栏 -->
                     <div v-if="isMultiSelectMode" class="flex items-center justify-around h-[50px]">
                         <button @click="deleteSelectedMessages" class="flex flex-col items-center text-gray-500"><i class="far fa-trash-alt text-lg"></i><span class="text-[10px]">删除</span></button>
+                        <button @click="favoriteSelectedMessages" class="flex flex-col items-center text-gray-500"><i class="fas fa-cube text-lg"></i><span class="text-[10px]">收藏</span></button>
                         <button @click="openForwardModal" class="flex flex-col items-center text-gray-500"><i class="fas fa-share text-lg"></i><span class="text-[10px]">转发</span></button>
                         <button @click="isMultiSelectMode = false" class="flex flex-col items-center text-gray-500"><i class="fas fa-times text-lg"></i><span class="text-[10px]">取消</span></button>
                     </div>
-                    <!-- 正常输入栏 -->
-                    <div v-else class="flex items-center gap-3 px-3 py-2">
+                    <!-- 正常输入栏 (优化布局) -->
+                    <div v-else class="flex items-center gap-2 px-2 py-2">
                         <transition name="fade"><div v-if="replyingTo" class="absolute bottom-full left-0 w-full bg-gray-100 p-2 text-xs text-gray-500 border-t border-gray-200 flex justify-between items-center z-10"><span>引用: {{ replyingTo.content }}</span><button @click="replyingTo=null"><i class="fas fa-times"></i></button></div></transition>
-                        <transition name="scale"><div v-if="wechatState.showAttachMenu" class="chat-attach-menu"><i class="far fa-image text-xl text-gray-500 cursor-pointer hover:text-black"></i><i class="far fa-star text-xl text-gray-500 cursor-pointer hover:text-black"></i><i class="fas fa-rss text-xl text-gray-500 cursor-pointer hover:text-black"></i></div></transition>
-                        <button @click.stop="wechatState.showAttachMenu = !wechatState.showAttachMenu" class="text-gray-400 hover:text-gray-600 transition"><i class="fas fa-paperclip text-xl"></i></button><i class="fas fa-microphone text-xl text-gray-400"></i><input v-model="inputMsg" @keyup.enter="sendMessage" class="flex-1 bg-gray-100 rounded-full py-2 px-4 text-sm border-none outline-none" placeholder="Aa..."><i class="far fa-smile text-xl text-gray-400"></i><button v-if="inputMsg.trim().length > 0" @click="sendMessage" class="text-gray-500 active:text-green-500 transition"><i class="fas fa-check-circle text-xl"></i></button><button v-else @click="triggerReceive" class="text-gray-400 active:text-blue-500 transition"><i class="far fa-comment-dots text-xl"></i></button>
+                        
+                        <button @click.stop="wechatState.showAttachMenu = !wechatState.showAttachMenu" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-800 transition shrink-0"><i class="fas fa-paperclip text-xl"></i></button>
+                        <button @click="openVoiceInput" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition active:scale-95 shrink-0"><i class="fas fa-microphone text-xl"></i></button>
+                        
+                        <input v-model="inputMsg" @keyup.enter="sendMessage" class="flex-1 bg-gray-100 rounded-full py-2 px-3 text-sm border-none outline-none min-w-0" placeholder="Aa...">
+                        
+                        <button @click="showStickerPanel = !showStickerPanel" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 transition shrink-0" :class="showStickerPanel ? 'text-yellow-500' : ''"><i class="far fa-smile text-xl"></i></button>
+                        
+                        <button v-if="inputMsg.trim().length > 0" @click="sendMessage" class="w-8 h-8 flex items-center justify-center text-gray-500 active:text-green-500 transition shrink-0"><i class="fas fa-check-circle text-2xl"></i></button>
+                        <!-- 接收按钮：灰色外观 (外圈+三点) 尺寸调小 -->
+                        <button v-else @click="triggerReceive" class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 transition shrink-0 active:scale-95"><i class="far fa-comment-dots text-xl"></i></button>
                     </div>
                 </div>
             </div>
 
             <!-- 聊天详情页 -->
             <div v-if="wechatState.activeNav === 'chat-details'" class="flex-1 flex flex-col bg-white absolute inset-0 z-30">
-                <header class="h-[90px] pt-10 px-4 flex items-center bg-white border-b border-gray-100"><button @click="wechatState.activeNav = 'room'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2">聊天详情</h1></header><div class="flex-1 overflow-y-auto p-5"><div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 mb-6 cursor-pointer active:bg-gray-100 transition" @click="editCurrentSessionFriend"><div class="w-16 h-16 rounded-full bg-white overflow-hidden shadow-sm shrink-0"><img :src="getCurrentSessionAvatar()" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h3 class="font-bold text-lg text-gray-900 truncate">{{ wechatState.activeSession.name }}</h3><p class="text-xs text-gray-500 mt-1 truncate">ID: {{ getCurrentSessionId() }}</p><p class="text-xs text-gray-400 mt-1 truncate">{{ getCurrentSessionBio() }}</p></div><i class="fas fa-chevron-right text-gray-300"></i></div><div class="space-y-6"><div class="flex justify-between items-center"><span class="text-sm">查找聊天记录</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="flex justify-between items-center"><span class="text-sm">消息免打扰</span><div class="w-10 h-6 bg-gray-200 rounded-full relative"><div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"></div></div></div><div class="flex justify-between items-center"><span class="text-sm">置顶聊天</span><input type="checkbox" class="switch-checkbox" id="pin-chat-toggle" :checked="wechatState.activeSession?.isPinned" @change="togglePin"><label for="pin-chat-toggle" class="switch-label"><div class="switch-button"></div></label></div><div class="flex justify-between items-center cursor-pointer active:opacity-50" @click="worldBinderModal.show = true"><div class="flex flex-col"><span class="text-sm">绑定世界书 (可多选)</span><span class="text-xs text-gray-400 mt-0.5">{{ getWorldbookStatus() }}</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><button @click="clearChatHistory" class="w-full text-red-500 font-bold text-sm py-2">清空聊天记录</button></div></div>
+                <header class="h-[90px] pt-10 px-4 flex items-center bg-white border-b border-gray-100"><button @click="wechatState.activeNav = 'room'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2">聊天详情</h1></header><div class="flex-1 overflow-y-auto p-5"><div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 mb-6 cursor-pointer active:bg-gray-100 transition" @click="editCurrentSessionFriend"><div class="w-16 h-16 rounded-full bg-white overflow-hidden shadow-sm shrink-0"><img :src="getCurrentSessionAvatar()" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h3 class="font-bold text-lg text-gray-900 truncate">{{ wechatState.activeSession.name }}</h3><p class="text-xs text-gray-500 mt-1 truncate">ID: {{ getCurrentSessionId() }}</p><p class="text-xs text-gray-400 mt-1 truncate">{{ getCurrentSessionBio() }}</p></div><i class="fas fa-chevron-right text-gray-300"></i></div>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center"><span class="text-sm">查找聊天记录</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>
+                    <!-- 聊天背景入口 -->
+                    <div class="flex justify-between items-center cursor-pointer active:bg-gray-50 p-2 -mx-2 rounded-lg" @click="navigateToChatBgSettings"><span class="text-sm">设置当前聊天背景</span><div class="flex items-center gap-2"><span class="text-xs text-gray-400">{{ wechatState.activeSession.wallpaper ? '已设置' : '默认' }}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div>
+                    <div class="flex justify-between items-center"><span class="text-sm">消息免打扰</span><div class="w-10 h-6 bg-gray-200 rounded-full relative"><div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"></div></div></div>
+                    <div class="flex justify-between items-center"><span class="text-sm">置顶聊天</span><input type="checkbox" class="switch-checkbox" id="pin-chat-toggle" :checked="wechatState.activeSession?.isPinned" @change="togglePin"><label for="pin-chat-toggle" class="switch-label"><div class="switch-button"></div></label></div>
+                    <div class="flex justify-between items-center cursor-pointer active:opacity-50" @click="worldBinderModal.show = true"><div class="flex flex-col"><span class="text-sm">绑定世界书 (可多选)</span><span class="text-xs text-gray-400 mt-0.5">{{ getWorldbookStatus() }}</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>
+                    <button @click="clearChatHistory" class="w-full text-red-500 font-bold text-sm py-2">清空聊天记录</button>
+                </div>
+                </div>
+            </div>
+
+            <!-- 聊天背景设置页 -->
+            <div v-if="wechatState.activeNav === 'chat-bg-settings'" class="flex-1 flex flex-col bg-gray-50 absolute inset-0 z-40">
+                <header class="h-[90px] pt-10 px-4 flex items-center bg-white border-b border-gray-100"><button @click="wechatState.activeNav = 'chat-details'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-black"></i></button><h1 class="font-bold text-[17px] ml-2">聊天背景</h1></header>
+                <div class="flex-1 p-6 flex flex-col items-center">
+                    <div class="w-48 h-80 bg-gray-200 rounded-lg overflow-hidden shadow-md mb-8 border-4 border-white relative">
+                        <img v-if="wechatState.activeSession.wallpaper" :src="wechatState.activeSession.wallpaper" class="w-full h-full object-cover">
+                        <div v-else class="w-full h-full flex items-center justify-center text-gray-400 flex-col"><i class="fas fa-image text-3xl mb-2"></i><span class="text-xs">默认</span></div>
+                    </div>
+                    <button @click="triggerChatBgUpload" class="w-full bg-black text-white py-3 rounded-xl font-bold text-sm mb-3">从相册选择</button>
+                    <button @click="resetChatBg" class="w-full bg-white text-red-500 border border-gray-200 py-3 rounded-xl font-bold text-sm">恢复默认</button>
+                </div>
+                <input type="file" ref="chatBgInput" accept="image/*" class="hidden" @change="handleChatBgChange">
+            </div>
+
+            <!-- 红包详情页 (新) -->
+            <div v-if="wechatState.activeNav === 'red-packet-detail'" class="flex-1 flex flex-col red-packet-bg absolute inset-0 z-50">
+                <div class="rp-header">
+                     <div class="pt-10 px-4 flex justify-between items-center text-white/90">
+                         <button @click="wechatState.activeNav = 'room'" class="flex items-center gap-1"><i class="fas fa-chevron-left"></i><span>返回</span></button>
+                         <span class="text-sm font-bold">红包</span>
+                         <span class="text-sm">红包记录</span>
+                     </div>
+                     <div class="rp-avatar-box">
+                         <img :src="currentRedPacketData.isSelf ? getMaskById(wechatState.activeSession.maskId).avatar : wechatState.activeSession.avatar" class="w-full h-full object-cover">
+                     </div>
+                </div>
+                <div class="flex-1 pt-12 flex flex-col items-center">
+                    <h3 class="font-bold text-lg mb-1">{{ currentRedPacketData.isSelf ? getMaskById(wechatState.activeSession.maskId).name : wechatState.activeSession.name }}发送的红包</h3>
+                    <p class="text-xs text-gray-400 mb-6">{{ currentRedPacketData.note }}</p>
+                    
+                    <h1 class="text-4xl font-bold text-[#d44d44] mb-8">{{ currentRedPacketData.amount }} <span class="text-sm text-black font-normal">元</span></h1>
+
+                    <div class="w-full bg-white flex-1 p-4 border-t border-gray-100">
+                        <div class="text-xs text-gray-400 mb-4 border-b border-gray-50 pb-2">1个红包，已领完</div>
+                        <div class="flex items-center justify-between">
+                             <div class="flex items-center gap-3">
+                                 <div class="w-10 h-10 rounded bg-gray-100 overflow-hidden"><img :src="!currentRedPacketData.isSelf ? getMaskById(wechatState.activeSession.maskId).avatar : wechatState.activeSession.avatar" class="w-full h-full object-cover"></div>
+                                 <div>
+                                     <div class="font-bold text-sm">{{ !currentRedPacketData.isSelf ? getMaskById(wechatState.activeSession.maskId).name : wechatState.activeSession.name }}</div>
+                                     <div class="text-xs text-gray-400">{{ formatChatTime(currentRedPacketData.time) }}</div>
+                                 </div>
+                             </div>
+                             <div class="font-bold text-sm">{{ currentRedPacketData.amount }} 元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- 消息列表 -->
@@ -484,33 +1108,58 @@
                 </div>
             </main>
 
-            <!-- 发现 -->
-            <main v-if="wechatState.activeNav === 'discover'" class="flex-1 overflow-y-auto flex items-center justify-center text-gray-400"><div class="text-center"><i class="fas fa-hammer text-3xl mb-2"></i><p>功能开发中</p></div></main>
+            <!-- 发现 (Discover - with Moments) -->
+            <main v-if="wechatState.activeNav === 'discover'" class="flex-1 overflow-y-auto bg-[#f3f4f6]">
+                <div class="mt-4 bg-white">
+                    <div @click="wechatState.activeNav = 'moments'" class="flex items-center p-4 active:bg-gray-50 cursor-pointer justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-6 h-6"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" class="w-full h-full"></div>
+                            <span class="text-[16px] text-black">朋友圈</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div v-if="moments.length > 0" class="w-8 h-8 rounded-md overflow-hidden bg-gray-100 relative">
+                                <img :src="moments[0].avatar" class="w-full h-full object-cover">
+                                <div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-white divide-y divide-gray-100">
+                    <div class="flex items-center p-4 active:bg-gray-50 cursor-pointer justify-between" @click="showToast('功能开发中')">
+                        <div class="flex items-center gap-4"><i class="fas fa-qrcode text-blue-500 text-xl w-6 text-center"></i><span class="text-[16px]">扫一扫</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>
+                    <div class="flex items-center p-4 active:bg-gray-50 cursor-pointer justify-between" @click="showToast('功能开发中')">
+                        <div class="flex items-center gap-4"><i class="fas fa-search text-orange-500 text-xl w-6 text-center"></i><span class="text-[16px]">搜一搜</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>
+                </div>
+            </main>
 
             <!-- 我 -->
             <main v-if="wechatState.activeNav === 'me'" class="flex-1 overflow-y-auto bg-white">
                 <div class="pt-20 px-6 pb-6">
                     <div class="flex items-center gap-4 mb-8"><div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100"><img v-if="homeProfile.avatar" :src="homeProfile.avatar" class="w-full h-full object-cover"></div><div><h2 class="text-xl font-bold">{{ homeProfile.name }}</h2><p class="text-xs text-gray-400 mt-1">微信号: {{ homeProfile.id }}</p></div><i class="fas fa-qrcode ml-auto text-gray-400"></i><i class="fas fa-chevron-right ml-4 text-gray-300 text-xs"></i></div>
-                    <div class="space-y-1 border-t border-gray-100"><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50" @click="openMaskManager"><div class="flex items-center gap-3"><i class="fas fa-mask text-purple-500 w-6"></i><span>面具</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50"><div class="flex items-center gap-3"><i class="fas fa-image text-blue-500 w-6"></i><span>朋友圈</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50"><div class="flex items-center gap-3"><i class="fas fa-cube text-orange-500 w-6"></i><span>收藏</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50"><div class="flex items-center gap-3"><i class="fas fa-smile text-yellow-500 w-6"></i><span>表情</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50"><div class="flex items-center gap-3"><i class="fas fa-cog text-blue-600 w-6"></i><span>设置</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div>
+                    <div class="space-y-1 border-t border-gray-100"><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50" @click="openMaskManager"><div class="flex items-center gap-3"><i class="fas fa-mask text-purple-500 w-6"></i><span>面具</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50" @click="wechatState.activeNav='wallet'"><div class="flex items-center gap-3"><i class="fas fa-wallet text-green-600 w-6"></i><span>钱包</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50" @click="openFavorites"><div class="flex items-center gap-3"><i class="fas fa-cube text-orange-500 w-6"></i><span>收藏</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50" @click="openStickerManager"><div class="flex items-center gap-3"><i class="fas fa-smile text-yellow-500 w-6"></i><span>表情</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="py-4 flex items-center justify-between cursor-pointer active:bg-gray-50"><div class="flex items-center gap-3"><i class="fas fa-cog text-blue-600 w-6"></i><span>设置</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div>
                 </div>
             </main>
 
             <!-- 底部悬浮导航 (聊天房间和聊天详情不显示) -->
-            <div v-if="wechatState.activeNav !== 'room' && wechatState.activeNav !== 'chat-details'" class="absolute bottom-6 left-1/2 -translate-x-1/2 wechat-bottom-nav flex items-center justify-around px-4 z-20">
+            <div v-if="wechatState.activeNav !== 'room' && wechatState.activeNav !== 'chat-details' && wechatState.activeNav !== 'chat-bg-settings' && wechatState.activeNav !== 'red-packet-detail' && wechatState.activeNav !== 'wallet' && wechatState.activeNav !== 'qinmi-manage' && wechatState.activeNav !== 'qinmi-specific-detail' && wechatState.activeNav !== 'moments'" class="absolute bottom-6 left-1/2 -translate-x-1/2 wechat-bottom-nav flex items-center justify-around px-4 z-20">
                 <div @click="wechatState.activeNav='chat'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='chat' ? 'text-black' : 'text-gray-400'"><i class="fas fa-comment"></i></div>
                 <div @click="wechatState.activeNav='contacts'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='contacts' ? 'text-black' : 'text-gray-400'"><i class="fas fa-address-book"></i></div>
                 <div @click="wechatState.activeNav='discover'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='discover' ? 'text-black' : 'text-gray-400'"><i class="far fa-compass"></i></div>
                 <div @click="wechatState.activeNav='me'" class="flex items-center justify-center w-10 h-full cursor-pointer transition text-xl" :class="wechatState.activeNav==='me' ? 'text-black' : 'text-gray-400'"><i class="far fa-user"></i></div>
             </div>
 
-            <!-- 面具管理 View -->
-            <transition name="page-slide"><div v-if="showMaskManager" class="absolute inset-0 z-30 bg-gray-50 flex flex-col"><div class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100"><button @click.stop="showMaskManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left"></i></button><h1 class="text-[17px] font-bold">我的面具</h1><button @click="openMaskEditor(null)" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-plus"></i></button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无面具，请点击右上角添加</div><div v-for="mask in masks" :key="mask.id" @click="openMaskEditor(mask)" class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-100 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"><i v-else class="fas fa-mask flex h-full items-center justify-center text-purple-300 text-xl"></i></div><div><h3 class="font-bold text-gray-900">{{ mask.name }}</h3><p class="text-xs text-gray-400 line-clamp-1">{{ mask.bio || '暂无介绍' }}</p></div></div></div></div></transition>
+            <!-- 面具管理 View (Fixed Add Button) -->
+            <transition name="page-slide"><div v-if="showMaskManager" class="absolute inset-0 z-[2000] bg-gray-50 flex flex-col"><div class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white border-b border-gray-100 relative z-50"><button @click.stop="showMaskManager = false" class="w-8 h-8 flex items-center justify-center text-black"><i class="fas fa-chevron-left text-lg"></i></button><h1 class="text-[17px] font-bold">我的面具</h1><button @click="openMaskEditor(null)" class="w-8 h-8 flex items-center justify-center text-black pointer-events-auto"><i class="fas fa-plus text-lg"></i></button></div><div class="flex-1 overflow-y-auto p-4 space-y-3"><div v-if="masks.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无面具，请点击右上角添加</div><div v-for="mask in masks" :key="mask.id" @click="openMaskEditor(mask)" class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-100 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gray-100 overflow-hidden shrink-0"><img v-if="mask.avatar" :src="mask.avatar" class="w-full h-full object-cover"><i v-else class="fas fa-mask flex h-full items-center justify-center text-purple-300 text-xl"></i></div><div><h3 class="font-bold text-gray-900">{{ mask.name }}</h3><p class="text-xs text-gray-400 line-clamp-1">{{ mask.bio || '暂无介绍' }}</p></div></div></div></div></transition>
         </div>
     </transition>
 
     <!-- 设置、主题、世界书 App 保持原样 (Template省略, 逻辑保留) -->
     <transition name="app-slide"><div v-if="currentApp === 'settings'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="navigateSettings('back')" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i v-if="settingsPage !== 'main'" class="fas fa-chevron-left text-sm"></i><i v-else class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">{{ settingsTitle }}</h1><div class="w-8"></div></header><main class="flex-1 overflow-y-auto relative"><transition name="page-slide"><div v-if="settingsPage === 'main'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100"><div class="w-14 h-14 rounded-full bg-gray-100 overflow-hidden"><img v-if="homeProfile.avatar" :src="homeProfile.avatar" class="w-full h-full object-cover"></div><div><div class="font-bold text-lg">{{ homeProfile.name }}</div><div class="text-xs text-gray-400">@{{ homeProfile.id }}</div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50"><div @click="navigateSettings('api-config')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center"><i class="fas fa-robot"></i></div><span class="font-medium text-gray-800">API 配置</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div @click="navigateSettings('notification')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center"><i class="fas fa-bell"></i></div><span class="font-medium text-gray-800">消息提示音</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div @click="navigateSettings('data-manage')" class="p-4 flex items-center justify-between active:bg-gray-50 cursor-pointer"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center"><i class="fas fa-database"></i></div><span class="font-medium text-gray-800">数据管理</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div><div class="p-4 flex items-center justify-between active:bg-gray-50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-purple-500 text-white flex items-center justify-center"><i class="fas fa-expand"></i></div><span class="font-medium text-gray-800">全屏模式</span></div><input type="checkbox" id="toggle-fs" class="switch-checkbox" v-model="isFullScreen" @change="toggleFullScreen"><label for="toggle-fs" class="switch-label"><div class="switch-button"></div></label></div><div class="p-4 flex items-center justify-between active:bg-gray-50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-gray-500 text-white flex items-center justify-center"><i class="fas fa-eye-slash"></i></div><span class="font-medium text-gray-800">隐藏状态栏</span></div><input type="checkbox" id="toggle-sb" class="switch-checkbox" v-model="hideStatusBar" @change="saveData"><label for="toggle-sb" class="switch-label"><div class="switch-button"></div></label></div></div></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'api-config'" class="absolute inset-0 p-4"><div class="space-y-5 pb-10"><div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4"><div><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">反代地址</label><input v-model="apiConfig.baseUrl" placeholder="https://..." class="w-full bg-gray-50 p-3 rounded-xl text-sm font-mono border border-gray-200 outline-none"></div><div><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">API 密钥</label><input v-model="apiConfig.apiKey" type="password" placeholder="sk-..." class="w-full bg-gray-50 p-3 rounded-xl text-sm font-mono border border-gray-200 outline-none"></div><div class="flex items-center gap-2"><button @click="fetchModels" :disabled="isLoading" class="flex-1 bg-gray-900 text-white py-2.5 rounded-xl text-sm font-bold active:scale-95 transition flex items-center justify-center gap-2"><i v-if="isLoading" class="fas fa-spinner fa-spin"></i><span v-else>拉取模型</span></button></div><div v-if="availableModels.length > 0" class="animate-fade-in"><label class="text-xs font-bold text-gray-500 ml-1 mb-1 block">选择模型</label><div @click="modelSelectModal.show = true" class="w-full bg-gray-50 p-3 rounded-xl text-sm font-medium border border-gray-200 flex justify-between items-center cursor-pointer"><span>{{ apiConfig.selectedModel || '点击选择' }}</span><i class="fas fa-chevron-down text-gray-400 text-xs"></i></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">API 预设</span><button @click="savePreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="apiPresets.length === 0" class="p-8 text-center text-gray-400 text-xs">暂无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(preset, idx) in apiPresets" :key="idx" class="p-4 flex items-center justify-between"><div class="flex-1 min-w-0 mr-4"><div class="font-bold text-gray-800 text-sm truncate">{{ preset.name }}</div><div class="text-[10px] text-gray-400 truncate">{{ preset.baseUrl }}</div></div><div class="flex items-center gap-2"><button @click="applyPreset(preset)" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-check text-xs"></i></button><button @click="deletePreset(idx)" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition"><i class="fas fa-trash text-xs"></i></button></div></div></div></div><button @click="saveSettings" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-200 active:scale-95 transition">保存配置</button></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'data-manage'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center"><div class="w-16 h-16 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-database"></i></div><h3 class="font-bold text-gray-900 text-lg">数据管理</h3><p class="text-xs text-gray-400 mt-2 px-4">备份恢复所有设置。</p></div><div class="grid grid-cols-2 gap-4"><button @click="exportData" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition"><div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-file-export"></i></div><span class="text-sm font-bold text-gray-700">导出</span></button><button @click="triggerImport" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition"><div class="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="fas fa-file-import"></i></div><span class="text-sm font-bold text-gray-700">导入</span></button></div><input type="file" ref="importInput" accept=".json" class="hidden" @change="handleImport"></div></div></transition><transition name="page-slide"><div v-if="settingsPage === 'notification'" class="absolute inset-0 p-4"><div class="space-y-4"><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"><div class="flex items-center justify-between mb-4"><span class="text-sm font-bold text-gray-700">当前提示音</span><span class="text-xs text-gray-400">{{ notificationConfig.currentName || '系统默认' }}</span></div><div class="flex gap-2"><button @click="triggerAudioUpload" class="flex-1 bg-gray-50 py-2.5 rounded-xl text-xs font-bold text-gray-700 active:bg-gray-100 transition border border-gray-100 flex items-center justify-center gap-2"><i class="fas fa-upload"></i> 导入</button><button @click="playCurrentSound" class="w-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100 active:scale-95 transition"><i class="fas fa-play"></i></button></div><input type="file" ref="audioInput" accept="audio/*" class="hidden" @change="handleAudioUpload"><button @click="simulateAiMessage" class="w-full mt-3 bg-gray-800 text-white py-2.5 rounded-xl text-xs font-bold active:bg-black transition">测试音效</button></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">音频预设</span><button @click="saveSoundPreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="soundPresets.length === 0" class="p-6 text-center text-gray-400 text-xs">暂无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(sound, idx) in soundPresets" :key="idx" class="p-4 flex items-center justify-between"><span class="font-bold text-gray-700 text-sm truncate max-w-[50%]">{{ sound.name }}</span><div class="flex items-center gap-2"><button @click="playPresetSound(sound)" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fas fa-play text-[10px]"></i></button><button @click="applySoundPreset(sound)" class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-check text-[10px]"></i></button><button @click="deleteSoundPreset(idx)" class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button></div></div></div></div></div></div></transition></main></div></transition>
-    <transition name="app-slide"><div v-if="currentApp === 'themes'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="navigateThemes('back')" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i v-if="themesPage !== 'main'" class="fas fa-chevron-left text-sm"></i><i v-else class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">{{ themesTitle }}</h1><div class="w-8"></div></header><main class="flex-1 overflow-y-auto relative"><transition name="page-slide"><div v-if="themesPage === 'main'" class="absolute inset-0 p-4"><div class="grid grid-cols-1 gap-4"><div @click="navigateThemes('wallpaper')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-image"></i></div><div><div class="font-bold text-gray-800">壁纸设置</div><div class="text-xs text-gray-400 mt-0.5">更换主屏幕背景</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('font')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl"><i class="fas fa-font"></i></div><div><div class="font-bold text-gray-800">字体设置</div><div class="text-xs text-gray-400 mt-0.5">自定义字体、大小和颜色</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('icons')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-icons"></i></div><div><div class="font-bold text-gray-800">图标设置</div><div class="text-xs text-gray-400 mt-0.5">自定义 App 图标与名称</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'wallpaper'" class="absolute inset-0 p-4 space-y-6"><div class="w-full aspect-[9/16] bg-gray-200 rounded-3xl overflow-hidden shadow-lg relative mx-auto max-w-[240px] border-4 border-white"><img v-if="themeConfig.wallpaper" :src="themeConfig.wallpaper" class="w-full h-full object-cover"><div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100"><i class="fas fa-image text-3xl mb-2"></i><span class="text-xs">默认壁纸</span></div></div><div class="flex flex-col gap-3"><button @click="triggerWallpaperUpload" class="w-full bg-gray-900 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition shadow-lg">从相册选择</button><button @click="resetWallpaper" class="w-full bg-white text-gray-600 py-3.5 rounded-2xl font-bold border border-gray-200 active:bg-gray-50 transition">恢复默认</button></div><input type="file" ref="wallpaperInput" accept="image/*" class="hidden" @change="handleWallpaperUpload"></div></transition><transition name="page-slide"><div v-if="themesPage === 'font'" class="absolute inset-0 p-4 pb-20"><div class="space-y-6"><div class="bg-gray-100 rounded-2xl p-6 text-center border border-gray-200" :style="{fontFamily: previewFontFamily || themeConfig.fontFamily}"><div class="text-2xl font-bold mb-2" :style="{color: themeConfig.fontColor}">12:30</div><div class="text-lg" :style="{color: themeConfig.fontColor}">Hello World</div><div class="text-sm opacity-60" :style="{color: themeConfig.fontColor}">预览字体效果</div></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3"><label class="text-xs font-bold text-gray-500 ml-1">字体 URL</label><div class="flex gap-2"><input v-model="fontInputUrl" placeholder="https://..." class="w-2/3 bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><button @click="previewFontFromUrl" :disabled="isLoading" class="flex-1 bg-gray-100 text-gray-600 px-2 rounded-xl font-bold text-xs active:scale-95 transition"><span v-if="!isLoading">预览</span><i v-else class="fas fa-spinner fa-spin"></i></button><button @click="applyFontFromUrl" class="flex-1 bg-black text-white px-2 rounded-xl font-bold text-xs active:scale-95 transition">应用</button></div></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-4"><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">大小</span><span class="text-xs text-gray-400">{{ (themeConfig.fontSize * 100).toFixed(0) }}%</span></div><input type="range" min="0.8" max="1.2" step="0.05" v-model.number="themeConfig.fontSize" @change="saveData" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"></div><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">色号</span></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full border border-gray-200 shadow-sm shrink-0" :style="{backgroundColor: themeConfig.fontColor}"></div><input type="text" v-model="themeConfig.fontColor" @change="saveData" placeholder="#000000" class="flex-1 bg-gray-50 px-3 py-2 rounded-xl text-sm border border-gray-200 font-mono outline-none uppercase"></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">预设</span><button @click="saveFontPreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="fontPresets.length === 0" class="p-6 text-center text-gray-400 text-xs">无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(fp, idx) in fontPresets" :key="idx" class="p-4 flex items-center justify-between"><div class="flex-1 min-w-0 mr-2"><div class="font-bold text-gray-800 text-sm truncate" :style="{fontFamily: fp.fontFamily}">{{ fp.name }}</div></div><div class="flex items-center gap-2"><button @click="applyFontPreset(fp)" class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-check text-[10px]"></i></button><button @click="deleteFontPreset(idx)" class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button></div></div></div></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'icons'" class="absolute inset-0 p-4 pb-20"><div class="space-y-4"><div class="flex justify-end"><button @click="resetAllIcons" class="text-xs text-red-500 font-bold px-3 py-1 bg-red-50 rounded-lg active:bg-red-100">重置所有</button></div><div class="space-y-3"><div v-for="appId in appList" :key="appId" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center bg-gray-50 shrink-0 home-icon-custom"><img v-if="hasCustomIcon(appId)" :src="getAppIcon(appId)" class="w-full h-full object-cover"><i v-else :class="getDefaultIconClass(appId) + ' text-gray-400 text-xl'"></i></div><div class="flex-1"><label class="text-[10px] font-bold text-gray-400 mb-1 block">应用名称</label><input :value="getAppName(appId)" @input="(e)=>setAppName(appId, e.target.value)" class="w-full bg-gray-50 px-2 py-1.5 rounded-lg text-sm border border-gray-200 outline-none"></div></div><div class="flex gap-2"><input v-model="tempIconUrls[appId]" placeholder="图标 URL" class="flex-1 bg-gray-50 px-3 py-2 rounded-lg text-xs border border-gray-200 outline-none"><button @click="setAppIcon(appId, tempIconUrls[appId])" class="px-3 bg-black text-white rounded-lg text-xs font-bold">确定</button><button @click="triggerIconUpload(appId)" class="px-3 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold active:bg-gray-200"><i class="fas fa-image"></i></button><button @click="resetApp(appId)" class="px-3 bg-red-50 text-red-500 rounded-lg text-xs active:bg-red-100"><i class="fas fa-undo"></i></button></div></div></div><input type="file" ref="iconUploadInput" accept="image/*" class="hidden" @change="handleIconFile"></div></div></transition></main></div></transition>
+    <transition name="app-slide"><div v-if="currentApp === 'themes'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="navigateThemes('back')" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i v-if="themesPage !== 'main'" class="fas fa-chevron-left text-sm"></i><i v-else class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">{{ themesTitle }}</h1><div class="w-8"></div></header><main class="flex-1 overflow-y-auto relative"><transition name="page-slide"><div v-if="themesPage === 'main'" class="absolute inset-0 p-4"><div class="grid grid-cols-1 gap-4"><div @click="navigateThemes('wallpaper')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-image"></i></div><div><div class="font-bold text-gray-800">壁纸设置</div><div class="text-xs text-gray-400 mt-0.5">更换主屏幕背景</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('font')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl"><i class="fas fa-font"></i></div><div><div class="font-bold text-gray-800">字体设置</div><div class="text-xs text-gray-400 mt-0.5">自定义字体、大小和颜色</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div><div @click="navigateThemes('icons')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer active:bg-gray-50 transition"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-icons"></i></div><div><div class="font-bold text-gray-800">图标设置</div><div class="text-xs text-gray-400 mt-0.5">自定义 App 图标与名称</div></div></div><i class="fas fa-chevron-right text-gray-300"></i></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'wallpaper'" class="absolute inset-0 p-4 space-y-6"><div class="w-full aspect-[9/16] bg-gray-200 rounded-3xl overflow-hidden shadow-lg relative mx-auto max-w-[240px] border-4 border-white"><img v-if="themeConfig.wallpaper" :src="themeConfig.wallpaper" class="w-full h-full object-cover"><div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100"><i class="fas fa-image text-3xl mb-2"></i><span class="text-xs">默认壁纸</span></div></div><div class="flex flex-col gap-3"><button @click="triggerWallpaperUpload" class="w-full bg-gray-900 text-white py-3.5 rounded-2xl font-bold active:scale-95 transition shadow-lg">从相册选择</button><button @click="resetWallpaper" class="w-full bg-white text-gray-600 py-3.5 rounded-2xl font-bold border border-gray-200 active:bg-gray-50 transition">恢复默认</button></div><input type="file" ref="wallpaperInput" accept="image/*" class="hidden" @change="handleWallpaperUpload"></div></transition><transition name="page-slide"><div v-if="themesPage === 'font'" class="absolute inset-0 p-4 pb-20"><div class="space-y-6"><div class="bg-gray-100 rounded-2xl p-6 text-center border border-gray-200" :style="{fontFamily: previewFontFamily || themeConfig.fontFamily}"><div class="text-2xl font-bold mb-2" :style="{color: themeConfig.fontColor}">12:30</div><div class="text-lg" :style="{color: themeConfig.fontColor}">Hello World</div><div class="text-sm opacity-60" :style="{color: themeConfig.fontColor}">预览字体效果</div></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3"><label class="text-xs font-bold text-gray-500 ml-1">字体 URL</label><div class="flex gap-2"><input v-model="fontInputUrl" placeholder="https://..." class="w-2/3 bg-gray-50 p-3 rounded-xl text-sm border border-gray-200 outline-none"><button @click="previewFontFromUrl" :disabled="isLoading" class="flex-1 bg-gray-100 text-gray-600 px-2 rounded-xl font-bold text-xs active:scale-95 transition"><span v-if="!isLoading">预览</span><i v-else class="fas fa-spinner fa-spin"></i></button><button @click="applyFontFromUrl" class="flex-1 bg-black text-white px-2 rounded-xl font-bold text-xs active:scale-95 transition">应用</button></div><button @click="resetFont" class="w-full bg-white text-red-500 py-2 rounded-xl font-bold text-xs border border-gray-100 active:bg-gray-50">恢复默认字体</button></div><div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-4"><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">大小</span><span class="text-xs text-gray-400">{{ (themeConfig.fontSize * 100).toFixed(0) }}%</span></div><input type="range" min="0.8" max="1.2" step="0.05" v-model.number="themeConfig.fontSize" @change="saveData" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"></div><div><div class="flex justify-between mb-2"><span class="text-xs font-bold text-gray-500">色号</span></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full border border-gray-200 shadow-sm shrink-0" :style="{backgroundColor: themeConfig.fontColor}"></div><input type="text" v-model="themeConfig.fontColor" @change="saveData" placeholder="#000000" class="flex-1 bg-gray-50 px-3 py-2 rounded-xl text-sm border border-gray-200 font-mono outline-none uppercase"></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"><div class="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50"><span class="font-bold text-gray-800 text-sm">预设</span><button @click="saveFontPreset" class="text-blue-600 text-xs font-bold px-3 py-1 bg-blue-50 rounded-lg active:bg-blue-100">保存</button></div><div v-if="fontPresets.length === 0" class="p-6 text-center text-gray-400 text-xs">无预设</div><div v-else class="divide-y divide-gray-50"><div v-for="(fp, idx) in fontPresets" :key="idx" class="p-4 flex items-center justify-between"><div class="flex-1 min-w-0 mr-2"><div class="font-bold text-gray-800 text-sm truncate" :style="{fontFamily: fp.fontFamily}">{{ fp.name }}</div></div><div class="flex items-center gap-2"><button @click="applyFontPreset(fp)" class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-check text-[10px]"></i></button><button @click="deleteFontPreset(idx)" class="w-7 h-7 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button></div></div></div></div></div></div></transition><transition name="page-slide"><div v-if="themesPage === 'icons'" class="absolute inset-0 p-4 pb-20"><div class="space-y-4"><div class="flex justify-end"><button @click="resetAllIcons" class="text-xs text-red-500 font-bold px-3 py-1 bg-red-50 rounded-lg active:bg-red-100">重置所有</button></div><div class="space-y-3"><div v-for="appId in appList" :key="appId" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center bg-gray-50 shrink-0 home-icon-custom"><img v-if="hasCustomIcon(appId)" :src="getAppIcon(appId)" class="w-full h-full object-cover"><i v-else :class="getDefaultIconClass(appId) + ' text-gray-400 text-xl'"></i></div><div class="flex-1"><label class="text-[10px] font-bold text-gray-400 mb-1 block">应用名称</label><input :value="getAppName(appId)" @input="(e)=>setAppName(appId, e.target.value)" class="w-full bg-gray-50 px-2 py-1.5 rounded-lg text-sm border border-gray-200 outline-none"></div></div><div class="flex gap-2"><input v-model="tempIconUrls[appId]" placeholder="图标 URL" class="flex-1 bg-gray-50 px-3 py-2 rounded-lg text-xs border border-gray-200 outline-none"><button @click="setAppIcon(appId, tempIconUrls[appId])" class="px-3 bg-black text-white rounded-lg text-xs font-bold">确定</button><button @click="triggerIconUpload(appId)" class="px-3 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold active:bg-gray-200"><i class="fas fa-image"></i></button><button @click="resetApp(appId)" class="px-3 bg-red-50 text-red-500 rounded-lg text-xs active:bg-red-100"><i class="fas fa-undo"></i></button></div></div></div><input type="file" ref="iconUploadInput" accept="image/*" class="hidden" @change="handleIconFile"></div></div></transition></main></div></transition>
     <transition name="app-slide"><div v-if="currentApp === 'worldbook'" class="absolute inset-0 z-[1000] bg-gray-50 flex flex-col overflow-hidden"><header class="bg-white/80 backdrop-blur h-[90px] pt-10 flex items-center justify-between px-4 border-b border-gray-200 sticky top-0 z-10"><button @click="closeApp" class="w-8 h-8 flex items-center justify-center text-gray-800 bg-gray-100 rounded-full active:bg-gray-200 transition"><i class="fas fa-times text-sm"></i></button><h1 class="font-bold text-gray-900 text-[17px]">世界书</h1><div class="flex gap-2"><button @click="openWorldModal('folder')" class="w-8 h-8 flex items-center justify-center text-yellow-600 bg-yellow-50 rounded-full"><i class="fas fa-folder-plus text-xs"></i></button><button @click="openWorldModal('file')" class="w-8 h-8 flex items-center justify-center text-blue-600 bg-blue-50 rounded-full"><i class="fas fa-file-circle-plus text-xs"></i></button></div></header><main class="flex-1 overflow-y-auto p-4 space-y-2"><div v-if="folders.length === 0 && rootFiles.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无内容，请点击右上角添加</div><div v-for="folder in folders" :key="folder.id" class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm"><div @click="toggleFolder(folder.id)" class="p-4 flex items-center justify-between active:bg-gray-50 transition cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-folder text-yellow-400 text-lg"></i><span class="font-bold text-gray-800 text-sm">{{ folder.name }}</span></div><div class="flex items-center gap-3"><button @click.stop="deleteWorldItem(folder.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button><i class="fas fa-chevron-right text-gray-300 text-xs transition-transform duration-200" :class="{'rotate-90': expandedFolders.includes(folder.id)}"></i></div></div><transition name="expand"><div v-if="expandedFolders.includes(folder.id)" class="bg-gray-50 border-t border-gray-100"><div v-if="getFiles(folder.id).length===0" class="p-3 text-center text-xs text-gray-400">空文件夹</div><div v-for="file in getFiles(folder.id)" :key="file.id" @click="viewFile(file)" class="p-3 pl-10 border-b border-gray-100 last:border-0 flex items-center justify-between active:bg-gray-100 cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-file-alt text-blue-400 text-sm"></i><span class="text-sm text-gray-700">{{ file.name }}</span></div><button @click.stop="deleteWorldItem(file.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div></div></transition></div><div v-for="file in rootFiles" :key="file.id" @click="viewFile(file)" class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between active:scale-[0.98] transition cursor-pointer"><div class="flex items-center gap-3"><i class="fas fa-file-alt text-gray-400 text-lg"></i><span class="font-bold text-gray-800 text-sm">{{ file.name }}</span></div><button @click.stop="deleteWorldItem(file.id)" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div></main></div></transition>
     <transition name="scale"><div v-if="viewFileModal.show" class="fixed inset-0 z-[9000] flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-white w-[85%] max-h-[70%] rounded-3xl overflow-hidden shadow-2xl flex flex-col"><div class="p-4 border-b border-gray-100 flex justify-between items-center"><h3 class="font-bold text-lg">{{ viewFileModal.data.name }}</h3><button @click="saveFileContent" class="text-blue-600 font-bold text-sm">保存</button></div><textarea v-model="viewFileModal.data.content" class="flex-1 p-4 text-sm leading-relaxed outline-none resize-none"></textarea><button @click="viewFileModal.show=false" class="p-4 bg-gray-50 text-gray-500 font-bold text-sm">关闭</button></div></div></transition>
 
@@ -561,12 +1210,12 @@ createApp({
             apiConfig: { baseUrl: '', apiKey: '', selectedModel: 'gpt-3.5-turbo' }, availableModels: [], apiPresets: [], 
             notificationConfig: { currentSound: null, currentName: '默认提示音' }, soundPresets: [],
             themeConfig: { wallpaper: '', fontFamily: '', fontUrl: '', fontSize: 1.0, fontColor: '#000000' }, fontPresets: [], fontInputUrl: '',
-            previewFontFamily: '', // New: Temporary preview font
+            previewFontFamily: '', 
             appList: Object.keys(DEFAULT_APPS), appCustomization: {}, tempIconUrls: {}, uploadingAppId: null,
             wechatState: { activeFilter: 'Chats', activeNav: 'chat', contacts: [], searchQuery: '', friendList: [], sessions: [], activeSession: null, showPlusMenu: false, showChatFunctions: false, showAttachMenu: false },
             addContactModal: { show: false }, chatWizard: { show: false, step: 1, type: 'single', selectedContacts: [], selectedMask: null },
             newContact: { name: '', remark: '', username: '', gender: '男', bio: '', nudge: '', signature: '', avatar: '' },
-            masks: [], showMaskManager: false, maskModal: { show: false }, maskForm: { id: null, name: '', username: '', gender: '女', bio: '', nudge: '', signature: '', avatar: '' },
+            masks: [], showMaskManager: false, maskModal: { show: false }, maskForm: { id: null, name: '', remark: '', username: '', gender: '女', bio: '', nudge: '', signature: '', avatar: '' },
             worldData: [], expandedFolders: [], worldModal: { show: false, type: 'folder', name: '', content: '', parentId: '' }, viewFileModal: { show: false, data: {} },
             worldBinderModal: { show: false },
             modelSelectModal: { show: false }, 
@@ -578,7 +1227,49 @@ createApp({
             statusModal: { show: false }, statusHistoryModal: { show: false },
             currentStatus: { action: '', thought: '', outfit: '', note: '' },
             currentStatusHistory: [], 
-            forwardModal: { show: false }, forwardingMsg: null, isMultiSelectMode: false, selectedMessageIds: [],
+            
+            // Favorites & History Selection
+            favorites: [], 
+            favoritesModal: { show: false },
+            isStatusMultiSelectMode: false,
+            selectedStatusIndices: [],
+
+            // Forward Modal (Reused for Qinmi Friend Select)
+            forwardModal: { show: false, mode: 'forward' }, forwardingMsg: null, isMultiSelectMode: false, selectedMessageIds: [],
+            
+            // Voice Input
+            voiceInputModal: { show: false, content: '' },
+
+            // Sticker System
+            showStickerManager: false,
+            showStickerPanel: false,
+            isStickerMultiSelect: false,
+            selectedStickerIds: [],
+            activeStickerGroupId: 'all',
+            stickerGroups: [ {id: 'all', name: '全部'} ],
+            stickers: [], // { id, url, desc, groupId }
+            
+            imageUploadInput: null, 
+
+            // Red Packet & Transfer & Wallet & Intimate Pay
+            redPacketModal: { show: false, amount: '', note: '' },
+            transferModal: { show: false, amount: '', note: '' },
+            currentRedPacketData: null,
+            wallet: { 
+                balance: 0.00, 
+                transactions: [], 
+                intimatePays: [] 
+            },
+            
+            // New Qinmi & Payment Modals
+            qinmiSelectModal: { show: false },
+            paymentSelectModal: { show: false, amount: 0 },
+            activeQinmiDetail: null,
+
+            // Moments
+            moments: [],
+            showPublishMoment: false,
+            newMoment: { content: '', images: [] },
 
             cardProfile: { name: '输入文字', id: '输入文字', bio: '你對我來說是宇宙，但我對你來說只是一顆星嗎？', status: '该用户已注销', avatar: '' },
             homeProfile: { name: '点击修改名字', id: 'username', bio: '点击修改个性签名', location: '未知星系', avatar: '' },
@@ -587,7 +1278,9 @@ createApp({
             editingWidgetId: null,
             statusBar: { time: '', batteryLevel: 100, isCharging: false },
             displayDate: { dateString: '', dayString: '' },
-            timer: null, toast: { show: false, message: '' }, inputModal: { show: false, title: '', value: '', placeholder: '', callback: null, desc: '' }, confirmModal: { show: false, message: '', callback: null },
+            timer: null, toast: { show: false, message: '' }, 
+            inputModal: { show: false, title: '', value: '', placeholder: '', callback: null, desc: '', inputType: 'text' }, 
+            confirmModal: { show: false, message: '', callback: null },
             inputMsg: '', deviceId: '', isTyping: false, replyingTo: null
         }
     },
@@ -605,11 +1298,20 @@ createApp({
             if (!this.wechatState.searchQuery) return sessions;
             const query = this.wechatState.searchQuery.toLowerCase();
             return sessions.filter(c => c.name.toLowerCase().includes(query));
+        },
+        filteredStickers() {
+            if(this.activeStickerGroupId === 'all') return this.stickers;
+            return this.stickers.filter(s => s.groupId === this.activeStickerGroupId);
         }
     },
     mounted() { 
         this.initDevice();
         this.loadData();
+        
+        this.imageUploadInput = document.createElement('input');
+        this.imageUploadInput.type = 'file';
+        this.imageUploadInput.accept = 'image/*';
+        this.imageUploadInput.onchange = this.handleImageUploadForChat;
         
         setTimeout(() => {
             const loader = document.getElementById('loading-screen');
@@ -691,17 +1393,19 @@ createApp({
             setTimeout(() => { 
                 this.currentApp = null; 
                 this.showMaskManager = false; 
+                this.showStickerManager = false;
                 this.maskModal.show = false;
                 this.addContactModal.show = false;
                 this.chatWizard.show = false;
                 this.statusModal.show = false;
+                this.favoritesModal.show = false;
+                this.qinmiSelectModal.show = false;
             }, 300); 
         },
         navigateSettings(t) { if (t === 'back') { if (this.settingsPage === 'main') this.closeApp(); else this.settingsPage = 'main'; } else { this.settingsPage = t; } },
         navigateThemes(t) { if (t === 'back') { if (this.themesPage === 'main') this.closeApp(); else this.themesPage = 'main'; } else { this.themesPage = t; } },
         toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(e => { this.showToast("全屏失败: " + e.message); this.isFullScreen = false; }); } else { if (document.exitFullscreen) document.exitFullscreen(); } },
 
-        // Chat Wizard
         startChatWizard(type) { this.wechatState.showPlusMenu = false; this.chatWizard = { show: true, step: 1, type: type, selectedContacts: [], selectedMask: null }; },
         closeChatWizard() { this.chatWizard.show = false; },
         selectWizardMask(mask) { this.chatWizard.selectedMask = mask; this.chatWizard.step = 2; },
@@ -721,7 +1425,7 @@ createApp({
                     id: Date.now().toString(), targetId: target.id, name: target.remark || target.name, 
                     avatar: target.avatar, maskId: mask.id, messages: [], lastMessage: '', time: Date.now(),
                     isPinned: false, boundWorldbookFolderId: null, boundWorldbookFolderIds: [],
-                    status: {}, statusHistory: []
+                    status: {}, statusHistory: [], wallpaper: ''
                 };
                 this.wechatState.sessions.unshift(session);
             }
@@ -731,14 +1435,27 @@ createApp({
             this.wechatState.activeSession = session; 
             this.wechatState.activeNav = 'room'; 
             this.inputMsg = ''; 
-            this.scrollToBottom(); 
+            this.showStickerPanel = false;
+            
+            // Force scroll to bottom immediately upon entry
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    const c = this.$refs.chatContainer;
+                    if (c) c.scrollTop = c.scrollHeight;
+                }, 50);
+            });
+
             this.currentStatus = session.status || {};
             this.currentStatusHistory = session.statusHistory || [];
         },
         goToChatDetails() { this.wechatState.activeNav = 'chat-details'; },
-        scrollToBottom() { this.$nextTick(() => { const c = this.$refs.chatContainer; if (c) c.scrollTop = c.scrollHeight; }); },
+        scrollToBottom() { 
+            this.$nextTick(() => { 
+                const c = this.$refs.chatContainer; 
+                if (c) c.scrollTop = c.scrollHeight; 
+            }); 
+        },
         
-        // Chat Logic
         sendMessage() {
             if(!this.inputMsg.trim()) return;
             const msg = { content: this.inputMsg, isSelf: true, time: Date.now(), avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar };
@@ -782,14 +1499,40 @@ createApp({
               "action": "current action description",
               "thought": "internal thoughts",
               "outfit": "current clothing",
-              "note": "short diary note (0-100 words)"
+              "note": "short diary note (0-100 words)",
+              "fake_image": "OPTIONAL: description of a photo you want to send",
+              "red_packet": { "amount": "8.88", "note": "Happy Day" },
+              "transfer": { "amount": "52.00", "note": "For you" },
+              "qinmi_reply": "accept" OR "reject" (Optional, use only if responding to Intimate Pay request)
             }
             "reply" is an array of strings. Split long text into natural short messages.`;
             
             contextMessages.push({ role: 'system', content: systemPrompt });
-            const recentMsgs = session.messages.slice(-15);
+            const recentMsgs = session.messages.slice(-10); // Limit context for images
+            
+            // Build Context with Vision Support
             recentMsgs.forEach(m => {
-                if(!m.isRecalled) contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: m.content });
+                if(!m.isRecalled) {
+                    if (m.type === 'image') {
+                         contextMessages.push({ 
+                             role: m.isSelf ? 'user' : 'assistant', 
+                             content: [
+                                 { type: "text", text: "[Image sent]" },
+                                 { type: "image_url", image_url: { url: m.content } }
+                             ] 
+                         });
+                    } else if (m.type === 'fake_image') {
+                        contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: `[Sent a fake photo with description: ${m.content}]` });
+                    } else if (m.type === 'red_packet') {
+                        contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: `[Red Packet: ${m.note}]` });
+                    } else if (m.type === 'transfer') {
+                        contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: `[Transfer: ${m.amount}]` });
+                    } else if (m.type === 'qinmi_invite') {
+                         contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: m.inviteType === 'give' ? '[User wants to give Intimate Pay]' : '[User asks for Intimate Pay]' });
+                    } else {
+                        contextMessages.push({ role: m.isSelf ? 'user' : 'assistant', content: m.content });
+                    }
+                }
             });
 
             try {
@@ -823,9 +1566,32 @@ createApp({
                     session.statusHistory.unshift(statusObj); 
                     this.currentStatus = statusObj; 
                 }
+                
+                // Handle Intimate Pay Response
+                this.handleAiQinmiResponse(session, parsed.qinmi_reply);
+
+                if (parsed.fake_image) {
+                     const fiMsg = { type: 'fake_image', content: parsed.fake_image, isRevealed: false, isSelf: false, time: Date.now(), avatar: session.avatar };
+                    session.messages.push(fiMsg); session.lastMessage = '[图片]';
+                }
+
+                if (parsed.red_packet || Math.random() < 0.05) {
+                    const amount = parsed.red_packet ? parsed.red_packet.amount : (Math.random() * 100).toFixed(2);
+                    const note = parsed.red_packet ? parsed.red_packet.note : "恭喜发财";
+                    const rpMsg = { type: 'red_packet', amount: amount, note: note, isSelf: false, time: Date.now(), avatar: session.avatar };
+                    session.messages.push(rpMsg); session.lastMessage = '[微信红包]';
+                }
+
+                if (parsed.transfer || Math.random() < 0.02) {
+                    const amount = parsed.transfer ? parsed.transfer.amount : "520.00";
+                    const note = parsed.transfer ? parsed.transfer.note : "转账给你";
+                    const tfMsg = { type: 'transfer', amount: amount, note: note, isSelf: false, time: Date.now(), avatar: session.avatar };
+                    session.messages.push(tfMsg); session.lastMessage = '[微信转账]';
+                }
 
                 this.isTyping = false; 
-                
+                this.handleAiIntimatePayConsumption(session);
+
                 let delay = 0;
                 segments.forEach((seg, index) => {
                     setTimeout(() => {
@@ -833,11 +1599,26 @@ createApp({
                              this.showGlobalNotification(session, seg);
                          }
 
-                         const aiMsg = { content: seg.trim(), isSelf: false, time: Date.now(), avatar: session.avatar };
+                         let msgType = 'text';
+                         let msgDuration = 0;
+                         if (seg.trim().length > 0 && Math.random() < 0.15) {
+                             msgType = 'voice';
+                             msgDuration = Math.max(1, Math.min(60, Math.ceil(seg.length / 3)));
+                         }
+
+                         const aiMsg = { 
+                             content: seg.trim(), 
+                             isSelf: false, 
+                             time: Date.now(), 
+                             avatar: session.avatar,
+                             type: msgType,
+                             duration: msgDuration,
+                             isExpanded: false
+                         };
                          session.messages.push(aiMsg);
                          this.scrollToBottom();
                          if (index === segments.length - 1) {
-                             session.lastMessage = seg.trim();
+                             session.lastMessage = msgType === 'voice' ? '[语音]' : seg.trim();
                              if (Math.random() < 0.1) {
                                  setTimeout(() => {
                                      const targetIdx = session.messages.indexOf(aiMsg);
@@ -849,7 +1630,6 @@ createApp({
                              }
                              this.saveData();
                          }
-                         // Play sound for EACH message
                          if(this.notificationConfig.currentSound) new Audio(this.notificationConfig.currentSound).play();
                     }, delay);
                     delay += 1000 + Math.random() * 800; 
@@ -860,7 +1640,7 @@ createApp({
                 this.showToast('AI 回复失败: ' + e.message);
             }
         },
-        viewRecalled(msg) { this.showConfirm(`撤回的内容:\n${msg.content}`, null); },
+        viewRecalled(msg) { this.showConfirm(`AI 撤回了:\n"${msg.content}"`, null); },
         showGlobalNotification(session, content) {
             this.globalNotification = { show: true, title: session.name, content: content, avatar: session.avatar, sessionId: session.id };
             setTimeout(() => { this.globalNotification.show = false; }, 3000);
@@ -883,6 +1663,7 @@ createApp({
             else if (action === 'quote') { this.replyingTo = msg; }
             else if (action === 'multi') { this.isMultiSelectMode = true; this.selectedMessageIds.push(msg); }
             else if (action === 'edit') { this.showInput("编辑", msg.content, "", (v) => { if(v){msg.content=v; this.saveData();} }); }
+            else if (action === 'favorite') { this.addToFavorites(msg.content, 'message', session.name); this.showToast('已收藏'); }
             else if (action === 'regenerate') {
                 let i = session.messages.length - 1;
                 while (i >= 0) {
@@ -902,15 +1683,19 @@ createApp({
             this.wechatState.showChatFunctions = false;
             this.wechatState.showAttachMenu = false;
             this.statusModal.show = false;
+            this.showStickerPanel = false;
         },
         openStatusModal() {
             if(!this.wechatState.activeSession) return;
-            // Load latest status
             this.currentStatus = this.wechatState.activeSession.status || { action: '无', thought: '...', outfit: '未知', note: '无' };
             this.currentStatusHistory = this.wechatState.activeSession.statusHistory || [];
             this.statusModal.show = true;
         },
-        openStatusHistory() { this.statusHistoryModal.show = true; },
+        openStatusHistory() { 
+            this.isStatusMultiSelectMode = false;
+            this.selectedStatusIndices = [];
+            this.statusHistoryModal.show = true; 
+        },
         togglePin() { if (this.wechatState.activeSession) { this.wechatState.activeSession.isPinned = !this.wechatState.activeSession.isPinned; this.saveData(); } },
         bindWorldFolder(folderId) {
             const session = this.wechatState.activeSession;
@@ -957,9 +1742,27 @@ createApp({
             this.addContactModal.show = false; this.saveData();
         },
         openMaskManager() { this.showMaskManager = true; },
-        openMaskEditor(mask) { if (mask) { this.maskForm = { ...mask }; } else { this.maskForm = { id: null, name: '', username: '', gender: '女', bio: '', nudge: '', signature: '', avatar: '' }; } this.maskModal.show = true; },
+        openMaskEditor(mask) { 
+            if (mask) { 
+                this.maskForm = { ...mask }; 
+            } else { 
+                // Initialize with all fields matching contact form, default gender Female
+                this.maskForm = { 
+                    id: null, 
+                    name: '', 
+                    remark: '',
+                    username: '', 
+                    gender: '女', 
+                    bio: '', 
+                    nudge: '', 
+                    signature: '', 
+                    avatar: '' 
+                }; 
+            } 
+            this.maskModal.show = true; 
+        },
         triggerMaskAvatar() { this.$refs.maskAvatarInput.click(); },
-        async handleMaskAvatar(e) { const f = e.target.files[0]; if(!f) return; try { this.maskForm.avatar = await compressImage(f, 300); } catch(e){} },
+        async handleMaskAvatar(e) { const f=e.target.files[0]; if(!f)return; try { this.maskForm.avatar = await compressImage(f, 300); } catch(e){} },
         saveMask() {
             if(!this.maskForm.name) return this.showToast('请输入姓名');
             if(this.maskForm.id) { const idx = this.masks.findIndex(m => m.id === this.maskForm.id); if(idx !== -1) this.masks[idx] = { ...this.maskForm }; } 
@@ -990,7 +1793,6 @@ createApp({
         resetApp(id) { if(this.appCustomization[id]) { delete this.appCustomization[id]; this.saveData(); this.showToast('已重置'); } },
         resetAllIcons() { this.showConfirm("重置所有？", () => { this.appCustomization = {}; this.saveData(); }); },
         
-        // Font
         previewFontFromUrl() {
             if(!this.fontInputUrl) return this.showToast('请输入URL');
             const n = 'PreviewFont_' + Date.now();
@@ -1013,6 +1815,13 @@ createApp({
         async loadFont(u, n) { 
             try { const f = new FontFace(n, `url(${u})`); await f.load(); document.fonts.add(f); document.body.style.fontFamily = n; } catch(e){} 
         },
+        resetFont() {
+            this.themeConfig.fontFamily = '';
+            this.themeConfig.fontUrl = '';
+            document.body.style.fontFamily = '';
+            this.saveData();
+            this.showToast('已恢复默认字体');
+        },
 
         saveFontPreset() { this.showInput("预设名称", "", "", (n) => { if(n) { this.fontPresets.push({ name:n, fontFamily:this.themeConfig.fontFamily, fontUrl:this.themeConfig.fontUrl, fontSize:this.themeConfig.fontSize, fontColor:this.themeConfig.fontColor }); this.saveData(); } }); },
         applyFontPreset(p) { if(p.fontUrl) this.loadFont(p.fontUrl, p.fontFamily); this.themeConfig.fontFamily=p.fontFamily; this.themeConfig.fontUrl=p.fontUrl; this.themeConfig.fontSize=p.fontSize; this.themeConfig.fontColor=p.fontColor; document.body.style.fontFamily=p.fontFamily; this.saveData(); },
@@ -1029,8 +1838,7 @@ createApp({
         applySoundPreset(s) { this.notificationConfig.currentSound=s.data; this.notificationConfig.currentName=s.name; this.saveData(); },
         deleteSoundPreset(i) { this.showConfirm("删除？",()=>{this.soundPresets.splice(i,1);this.saveData();}); },
         
-        // Import Logic Fixed
-        exportData() { const d={...this.$data}; delete d.isAppOpen; delete d.currentApp; delete d.showMaskManager; delete d.maskModal.show; delete d.addContactModal.show; delete d.chatWizard.show; delete d.chatContextMenu.show; delete d.statusModal.show; delete d.statusHistoryModal.show; delete d.forwardModal.show; delete d.folderSelectModal.show; delete d.modelSelectModal.show; delete d.worldBinderModal.show; delete d.viewFileModal.show; delete d.worldModal.show; const b=new Blob([JSON.stringify(d)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='backup.json'; a.click(); },
+        exportData() { const d={...this.$data}; delete d.isAppOpen; delete d.currentApp; delete d.showMaskManager; delete d.showStickerManager; delete d.maskModal.show; delete d.addContactModal.show; delete d.chatWizard.show; delete d.chatContextMenu.show; delete d.statusModal.show; delete d.statusHistoryModal.show; delete d.forwardModal.show; delete d.folderSelectModal.show; delete d.modelSelectModal.show; delete d.worldBinderModal.show; delete d.viewFileModal.show; delete d.worldModal.show; delete d.favoritesModal.show; delete d.voiceInputModal.show; delete d.redPacketModal.show; delete d.transferModal.show; delete d.qinmiSelectModal.show; delete d.paymentSelectModal.show; delete d.showPublishMoment; const b=new Blob([JSON.stringify(d)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='backup.json'; a.click(); },
         triggerImport() { this.$refs.importInput.click(); },
         handleImport(e) { 
             const f=e.target.files[0]; if(!f)return; 
@@ -1069,7 +1877,17 @@ createApp({
             if (localStorage.getItem('onyunx_is_activated') === 'true') { this.isActivated = true; }
         },
         showToast(m) { this.toast.message=m; this.toast.show=true; setTimeout(()=>{this.toast.show=false},2000); },
-        showInput(t,v,p,cb) { this.inputModal={show:true,title:t,value:v,placeholder:p,callback:cb,desc:''}; },
+        showInput(t,v,p,cb, inputType = 'text') { 
+            this.inputModal = {
+                show: true,
+                title: t,
+                value: v,
+                placeholder: p,
+                callback: cb,
+                desc: '',
+                inputType: inputType
+            }; 
+        },
         showConfirm(m, cb) { this.confirmModal={show:true, message:m, callback:cb}; },
         handleInputConfirm() { if(this.inputModal.callback)this.inputModal.callback(this.inputModal.value); this.inputModal.show=false; },
         handleConfirm() { if(this.confirmModal.callback)this.confirmModal.callback(); this.confirmModal.show=false; },
@@ -1079,11 +1897,575 @@ createApp({
         applyPreset(p) { this.apiConfig.baseUrl = p.baseUrl; this.apiConfig.apiKey = p.apiKey; this.apiConfig.selectedModel = p.selectedModel; this.showToast(`已应用: ${p.name}`); },
         deletePreset(i) { this.showConfirm("确定删除该预设吗？", () => { this.apiPresets.splice(i, 1); this.saveData(); this.showToast('已删除'); }); },
         saveSettings() { this.saveData(); this.showToast('配置已保存'); this.navigateSettings('back'); },
-        // ... Multi-select, Forward, Recall functions retained implicitly
+        
         toggleSelectMessage(msg) { const idx = this.selectedMessageIds.indexOf(msg); if (idx > -1) this.selectedMessageIds.splice(idx, 1); else this.selectedMessageIds.push(msg); },
         deleteSelectedMessages() { const session = this.wechatState.activeSession; session.messages = session.messages.filter(m => !this.selectedMessageIds.includes(m)); this.selectedMessageIds = []; this.isMultiSelectMode = false; this.saveData(); },
-        openForwardModal() { if(this.selectedMessageIds.length === 0) return this.showToast('未选择消息'); this.forwardModal.show = true; },
-        doForward(targetFriendId) { let targetSession = this.wechatState.sessions.find(s => s.targetId === targetFriendId); if (!targetSession) { const friend = this.wechatState.friendList.find(f => f.id === targetFriendId); if(!friend) return; targetSession = { id: Date.now().toString(), targetId: friend.id, name: friend.remark || friend.name, avatar: friend.avatar, maskId: this.wechatState.activeSession.maskId, messages: [], lastMessage: '', time: Date.now() }; this.wechatState.sessions.unshift(targetSession); } const summary = this.selectedMessageIds.map(m => m.content).slice(0, 3).join('\n') + (this.selectedMessageIds.length > 3 ? '...' : ''); const forwardMsg = { type: 'forward', content: summary, isSelf: true, time: Date.now(), avatar: this.getMaskById(targetSession.maskId).avatar }; targetSession.messages.push(forwardMsg); targetSession.lastMessage = '[聊天记录]'; this.forwardModal.show = false; this.isMultiSelectMode = false; this.selectedMessageIds = []; this.saveData(); this.showToast('已转发'); },
+        openForwardModal() { if(this.selectedMessageIds.length === 0) return this.showToast('未选择消息'); this.forwardModal.mode = 'forward'; this.forwardModal.show = true; },
+        doForward(targetFriendId) { 
+            let targetSession = this.wechatState.sessions.find(s => s.targetId === targetFriendId); 
+            if (!targetSession) { 
+                const friend = this.wechatState.friendList.find(f => f.id === targetFriendId); 
+                if(!friend) return; 
+                targetSession = { id: Date.now().toString(), targetId: friend.id, name: friend.remark || friend.name, avatar: friend.avatar, maskId: this.wechatState.activeSession.maskId, messages: [], lastMessage: '', time: Date.now(), wallpaper: '' }; 
+                this.wechatState.sessions.unshift(targetSession); 
+            } 
+            const summary = this.selectedMessageIds.map(m => `[${m.isSelf?'我':this.wechatState.activeSession.name}] ${m.content.substring(0,20)}${m.content.length>20?'...':''}`).slice(0, 4).join('\n') + (this.selectedMessageIds.length > 4 ? `\n...等${this.selectedMessageIds.length}条消息` : '');
+            
+            const forwardMsg = { 
+                type: 'forward', 
+                content: summary, 
+                isSelf: true, 
+                time: Date.now(), 
+                avatar: this.getMaskById(targetSession.maskId).avatar 
+            }; 
+            
+            targetSession.messages.push(forwardMsg); 
+            targetSession.lastMessage = '[聊天记录]'; 
+            this.forwardModal.show = false; 
+            this.isMultiSelectMode = false; 
+            this.selectedMessageIds = []; 
+            this.saveData(); 
+            this.showToast('已转发'); 
+        },
+        
+        toggleStatusMultiSelect() { this.isStatusMultiSelectMode = !this.isStatusMultiSelectMode; this.selectedStatusIndices = []; },
+        toggleSelectStatus(idx) { const i = this.selectedStatusIndices.indexOf(idx); if (i > -1) this.selectedStatusIndices.splice(i, 1); else this.selectedStatusIndices.push(idx); },
+        deleteSelectedStatus() {
+             const session = this.wechatState.activeSession;
+             this.selectedStatusIndices.sort((a,b)=>b-a).forEach(idx => {
+                 session.statusHistory.splice(idx, 1);
+             });
+             this.selectedStatusIndices = [];
+             this.isStatusMultiSelectMode = false;
+             this.saveData();
+        },
+        
+        openFavorites() { this.favoritesModal.show = true; },
+        addToFavorites(content, type, source) {
+            this.favorites.unshift({
+                content: content,
+                type: type,
+                source: source,
+                time: Date.now()
+            });
+            this.saveData();
+        },
+        deleteFavorite(idx) {
+            this.favorites.splice(idx, 1);
+            this.saveData();
+        },
+        favoriteSelectedStatus() {
+            const session = this.wechatState.activeSession;
+            this.selectedStatusIndices.forEach(idx => {
+                const item = session.statusHistory[idx];
+                const content = `[心声] ${item.thought}\n[随笔] ${item.note}\n[动作] ${item.action}`;
+                this.addToFavorites(content, 'status', session.name);
+            });
+            this.showToast(`已收藏 ${this.selectedStatusIndices.length} 条`);
+            this.selectedStatusIndices = [];
+            this.isStatusMultiSelectMode = false;
+        },
+        favoriteSelectedMessages() {
+             if(this.selectedMessageIds.length === 0) return this.showToast('未选择消息');
+             const session = this.wechatState.activeSession;
+             this.selectedMessageIds.forEach(msg => {
+                 this.addToFavorites(msg.content, 'message', session.name);
+             });
+             this.showToast(`已收藏 ${this.selectedMessageIds.length} 条`);
+             this.selectedMessageIds = [];
+             this.isMultiSelectMode = false;
+        },
+        
+        navigateToChatBgSettings() { this.wechatState.activeNav = 'chat-bg-settings'; },
+        triggerChatBgUpload() { this.$refs.chatBgInput.click(); },
+        async handleChatBgChange(e) {
+             const f = e.target.files[0]; if(!f) return;
+             try {
+                 this.wechatState.activeSession.wallpaper = await compressImage(f, 1080);
+                 this.saveData();
+                 this.showToast('背景已设置');
+             } catch(e) {}
+        },
+        resetChatBg() {
+            this.wechatState.activeSession.wallpaper = '';
+            this.saveData();
+            this.showToast('已恢复默认背景');
+        },
+
+        openVoiceInput() { this.voiceInputModal.show = true; this.voiceInputModal.content = ''; },
+        sendVoiceMessage() {
+            if(!this.voiceInputModal.content.trim()) return this.showToast('内容为空');
+            const txt = this.voiceInputModal.content.trim();
+            const duration = Math.max(1, Math.min(60, Math.ceil(txt.length / 3))); // Estimate duration
+            
+            const msg = {
+                type: 'voice',
+                content: txt,
+                duration: duration,
+                isExpanded: false,
+                isSelf: true,
+                time: Date.now(),
+                avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+            };
+            this.wechatState.activeSession.messages.push(msg);
+            this.wechatState.activeSession.lastMessage = '[语音]';
+            this.voiceInputModal.show = false;
+            this.scrollToBottom();
+            this.saveData();
+        },
+        toggleVoiceText(msg) { msg.isExpanded = !msg.isExpanded; },
+
+        openStickerManager() { this.showStickerManager = true; this.isStickerMultiSelect = false; },
+        triggerStickerUpload() { this.$refs.stickerUploadInput.click(); },
+        async handleStickerUpload(e) {
+            const files = e.target.files; if(!files.length) return;
+            for(let i=0; i<files.length; i++) {
+                try {
+                    const url = await compressImage(files[i], 300);
+                    this.stickers.push({
+                        id: Date.now().toString() + Math.random(),
+                        url: url,
+                        desc: '未命名',
+                        groupId: this.activeStickerGroupId === 'all' ? 'all' : this.activeStickerGroupId
+                    });
+                } catch(err) {}
+            }
+            this.saveData();
+            e.target.value = '';
+        },
+        openUrlImportModal() {
+            this.showInput('导入网络表情', '', '格式: URL 描述 (每行一个)', (val) => {
+                if(!val) return;
+                const lines = val.split('\n');
+                lines.forEach(line => {
+                    const parts = line.trim().split(/\s+(.+)/);
+                    if(parts.length >= 1 && parts[0].startsWith('http')) {
+                        this.stickers.push({
+                            id: Date.now().toString() + Math.random(),
+                            url: parts[0],
+                            desc: parts[1] || '网络表情',
+                            groupId: this.activeStickerGroupId === 'all' ? 'all' : this.activeStickerGroupId
+                        });
+                    }
+                });
+                this.saveData();
+                this.showToast('导入完成');
+            }, 'textarea'); 
+        },
+        toggleStickerMultiSelect() { 
+            this.isStickerMultiSelect = !this.isStickerMultiSelect; 
+            this.selectedStickerIds = []; 
+        },
+        handleStickerClick(sticker) {
+            if(this.isStickerMultiSelect) {
+                const idx = this.selectedStickerIds.indexOf(sticker.id);
+                if(idx > -1) this.selectedStickerIds.splice(idx, 1);
+                else this.selectedStickerIds.push(sticker.id);
+            } else {
+                this.showInput('修改描述', sticker.desc, '', (val) => {
+                    if(val) { sticker.desc = val; this.saveData(); }
+                });
+            }
+        },
+        deleteSelectedStickers() {
+            this.stickers = this.stickers.filter(s => !this.selectedStickerIds.includes(s.id));
+            this.selectedStickerIds = [];
+            this.isStickerMultiSelect = false;
+            this.saveData();
+        },
+        addStickerGroup() {
+            this.showInput('新建分组', '', '分组名称', (val) => {
+                if(val) {
+                    this.stickerGroups.push({ id: Date.now().toString(), name: val });
+                    this.saveData();
+                }
+            });
+        },
+        handleGroupClick(group) {
+            if(this.activeStickerGroupId === group.id && group.id !== 'all') {
+                this.showInput('重命名分组', group.name, '', (val) => {
+                    if(val) { group.name = val; this.saveData(); }
+                });
+            } else {
+                this.activeStickerGroupId = group.id;
+            }
+        },
+        getStickersForPanel() {
+            if(this.activeStickerGroupId === 'all') return this.stickers;
+            return this.stickers.filter(s => s.groupId === this.activeStickerGroupId);
+        },
+        sendSticker(sticker) {
+            const msg = {
+                type: 'image',
+                content: sticker.url,
+                isSelf: true,
+                time: Date.now(),
+                avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+            };
+            this.wechatState.activeSession.messages.push(msg);
+            this.wechatState.activeSession.lastMessage = '[图片]';
+            this.showStickerPanel = false;
+            this.scrollToBottom();
+            this.saveData();
+        },
+        
+        triggerImageUpload() { this.imageUploadInput.click(); },
+        async handleImageUploadForChat(e) {
+            const f = e.target.files[0]; if(!f) return;
+            try {
+                const url = await compressImage(f, 600);
+                const msg = {
+                    type: 'image',
+                    content: url,
+                    isSelf: true,
+                    time: Date.now(),
+                    avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+                };
+                this.wechatState.activeSession.messages.push(msg);
+                this.wechatState.activeSession.lastMessage = '[图片]';
+                this.wechatState.showAttachMenu = false;
+                this.scrollToBottom();
+                this.saveData();
+                this.triggerReceive();
+            } catch(e) {}
+            e.target.value = '';
+        },
+
+        openFakeImageInput() {
+            this.showInput('拍摄 (文字拟图)', '', '例如: 一张风景照', (val) => {
+                if(!val) return;
+                const msg = {
+                    type: 'fake_image',
+                    content: val,
+                    isRevealed: false,
+                    isSelf: true,
+                    time: Date.now(),
+                    avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+                };
+                this.wechatState.activeSession.messages.push(msg);
+                this.wechatState.activeSession.lastMessage = '[图片]';
+                this.wechatState.showAttachMenu = false;
+                this.scrollToBottom();
+                this.saveData();
+            });
+        },
+
+        openRedPacketModal() {
+             this.redPacketModal = { show: true, amount: '', note: '' };
+             this.wechatState.showAttachMenu = false;
+        },
+        sendRedPacket() {
+             const amt = parseFloat(this.redPacketModal.amount);
+             if(!amt || amt <= 0) return this.showToast('请输入金额');
+             if(this.wallet.balance < amt) return this.showToast('余额不足');
+             
+             this.addToWallet('expense', amt, this.wechatState.activeSession.name, '发出红包');
+             
+             const msg = {
+                 type: 'red_packet',
+                 amount: this.redPacketModal.amount,
+                 note: this.redPacketModal.note || '恭喜发财，大吉大利',
+                 isSelf: true,
+                 time: Date.now(),
+                 avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+             };
+             this.wechatState.activeSession.messages.push(msg);
+             this.wechatState.activeSession.lastMessage = '[微信红包]';
+             this.redPacketModal.show = false;
+             this.scrollToBottom();
+             this.saveData();
+        },
+        
+        handleChatBubbleClick(msg) {
+            if(msg.type === 'red_packet') {
+                if(!msg.isSelf) { 
+                    if (!msg.isOpened) {
+                         this.addToWallet('income', parseFloat(msg.amount), this.wechatState.activeSession.name, '红包收入');
+                         msg.isOpened = true;
+                         this.saveData();
+                    }
+                }
+                this.currentRedPacketData = msg;
+                this.wechatState.activeNav = 'red-packet-detail';
+            } else if(msg.type === 'transfer') {
+                if(!msg.isReceived && !msg.isSelf) {
+                    msg.isReceived = true;
+                    this.addToWallet('income', parseFloat(msg.amount), this.wechatState.activeSession.name, '转账收款');
+                    this.saveData();
+                    this.showToast(`已收款 ￥${msg.amount}`);
+                } else if(msg.isSelf) {
+                    this.showToast('等待对方收款');
+                }
+            } else if(msg.type === 'voice') {
+                this.toggleVoiceText(msg);
+            } else if(msg.type === 'fake_image') {
+                msg.isRevealed = !msg.isRevealed;
+            } else if(msg.type === 'qinmi_invite') {
+                // Clicking invitation in chat - does nothing for user (status handled elsewhere)
+            }
+        },
+
+        openTransferModal() {
+             this.transferModal = { show: true, amount: '', note: '' };
+             this.wechatState.showAttachMenu = false;
+        },
+        sendTransfer() {
+             const amt = parseFloat(this.transferModal.amount);
+             if(!amt || amt <= 0) return this.showToast('请输入金额');
+             if(this.wallet.balance < amt) return this.showToast('余额不足');
+             
+             this.addToWallet('expense', amt, this.wechatState.activeSession.name, '转账支出');
+
+             const msg = {
+                 type: 'transfer',
+                 amount: this.transferModal.amount,
+                 note: this.transferModal.note,
+                 isSelf: true,
+                 time: Date.now(),
+                 avatar: this.getMaskById(this.wechatState.activeSession.maskId).avatar
+             };
+             this.wechatState.activeSession.messages.push(msg);
+             this.wechatState.activeSession.lastMessage = '[微信转账]';
+             this.transferModal.show = false;
+             this.scrollToBottom();
+             this.saveData();
+        },
+        
+        addToWallet(type, amount, source, desc) {
+            if(type === 'income') this.wallet.balance = parseFloat(this.wallet.balance) + parseFloat(amount);
+            else this.wallet.balance = parseFloat(this.wallet.balance) - parseFloat(amount);
+            
+            this.wallet.transactions.unshift({
+                type, amount, source, desc, time: Date.now()
+            });
+            this.saveData();
+        },
+        formatMoney(num) { return parseFloat(num).toFixed(2); },
+        triggerTopUp() {
+            this.showInput("充值", "", "请输入充值金额", (val) => {
+                const amt = parseFloat(val);
+                if(amt > 0) {
+                    this.addToWallet('income', amt, '系统', '充值');
+                    this.showToast('充值成功');
+                }
+            }, 'number');
+        },
+        triggerPayment() { // Simulates Payment now (which can use Qinmi)
+             this.showInput("模拟消费", "", "输入消费金额", (val) => {
+                 const amt = parseFloat(val);
+                 if(amt > 0) {
+                     this.paymentSelectModal.amount = amt;
+                     this.paymentSelectModal.show = true;
+                 }
+             }, 'number');
+        },
+        triggerWithdraw() { // Replaces simulate payment if needed, but per request "Change back to withdraw"
+            this.showInput("提现", "", "请输入提现金额", (val) => {
+                const amt = parseFloat(val);
+                if(amt > 0) {
+                    if(this.wallet.balance >= amt) {
+                        this.addToWallet('expense', amt, '银行卡', '提现');
+                        this.showToast('提现成功');
+                    } else {
+                        this.showToast('余额不足');
+                    }
+                }
+            }, 'number');
+        },
+        
+        // Qinmi Logic
+        openQinmiSelectModal() { this.qinmiSelectModal.show = true; },
+        startQinmiProcess(type) {
+            this.qinmiSelectModal.show = false;
+            this.forwardModal.mode = 'qinmi';
+            this.forwardModal.inviteType = type;
+            this.forwardModal.show = true;
+        },
+        handleFriendSelect(friend) {
+            if (this.forwardModal.mode === 'qinmi') {
+                const inviteType = this.forwardModal.inviteType;
+                const existing = this.wallet.intimatePays.find(p => p.targetId === friend.id && p.status === 'active');if (existing) return this.showToast('该好友已有生效的亲密付');
+
+                // If 'give', set limit first
+                if (inviteType === 'give') {
+                    this.showInput(`为 ${friend.remark || friend.name} 开通亲密付`, '', '设置每月限额', (val) => {
+                        const limit = parseFloat(val);
+                        if (limit > 0) {
+                            this.sendQinmiInviteMessage(friend, inviteType, limit);
+                        }
+                    }, 'number');
+                } else {
+                    // 'ask', limit set by AI later
+                    this.sendQinmiInviteMessage(friend, inviteType, 0);
+                }
+                this.forwardModal.show = false;
+            } else {
+                this.doForward(friend.id);
+            }
+        },
+        sendQinmiInviteMessage(friend, inviteType, limit) {
+             let session = this.wechatState.sessions.find(s => s.targetId === friend.id);
+             if (!session) {
+                 // Try to get a mask, if no active session mask, use first available or placeholder
+                 const maskToUse = this.wechatState.activeSession ? this.getMaskById(this.wechatState.activeSession.maskId) : (this.masks.length > 0 ? this.masks[0] : {id:'default', avatar:''});
+                 
+                 this.createSession(friend, maskToUse);
+                 // Re-find session as createSession pushes it
+                 session = this.wechatState.sessions.find(s => s.targetId === friend.id); 
+             }
+             
+             // Create record
+             this.wallet.intimatePays.push({
+                 id: Date.now().toString(),
+                 targetId: friend.id,
+                 type: inviteType === 'give' ? 'outcome' : 'income',
+                 limit: limit, // 0 for 'ask' until accepted
+                 balanceUsed: 0,
+                 status: 'pending',
+                 history: []
+             });
+
+             const msg = {
+                 type: 'qinmi_invite',
+                 inviteType: inviteType,
+                 isSelf: true,
+                 time: Date.now(),
+                 avatar: this.getMaskById(session.maskId).avatar
+             };
+             session.messages.push(msg);
+             session.lastMessage = '[亲密付邀请]';
+             this.saveData();
+             this.openApp('wechat');
+             this.enterChatRoom(session);
+             
+             // Trigger AI Response
+             this.triggerReceive();
+        },
+        handleAiQinmiResponse(session, decision) {
+             const pending = this.wallet.intimatePays.find(p => p.targetId === session.targetId && p.status === 'pending');
+             if (!pending) return;
+
+             // AI Logic: Accept by default (or use LLM output)
+             const accept = decision ? (decision.toLowerCase().includes('accept') || decision.toLowerCase().includes('ok')) : (Math.random() < 0.8);
+             
+             if (accept) {
+                 pending.status = 'active';
+                 if (pending.type === 'income') {
+                     // AI sets limit for me
+                     pending.limit = (Math.floor(Math.random() * 50) + 10) * 100; // 1000 - 6000
+                 }
+                 const replyMsg = {
+                     content: pending.type === 'income' ? `没问题，亲密付已开通，每月限额 ¥${pending.limit}。` : `谢谢你的礼物，我会珍惜使用的。`,
+                     isSelf: false,
+                     time: Date.now(),
+                     avatar: session.avatar
+                 };
+                 session.messages.push(replyMsg);
+                 this.saveData();
+             } else {
+                 pending.status = 'rejected';
+                 const replyMsg = {
+                     content: `抱歉，我现在不需要这个。`,
+                     isSelf: false,
+                     time: Date.now(),
+                     avatar: session.avatar
+                 };
+                 session.messages.push(replyMsg);
+                 this.saveData();
+             }
+        },
+        openQinmiManage() { this.wechatState.activeNav = 'qinmi-manage'; },
+        openQinmiSpecificDetail(qp) {
+            this.activeQinmiDetail = qp;
+            this.wechatState.activeNav = 'qinmi-specific-detail';
+        },
+        getAvailableQinmiSources() {
+            return this.wallet.intimatePays.filter(p => p.type === 'income' && p.status === 'active' && (p.limit - p.balanceUsed) > 0);
+        },
+        confirmPayment(method, source) {
+            const amount = this.paymentSelectModal.amount;
+            if (method === 'balance') {
+                if (this.wallet.balance < amount) return this.showToast('余额不足');
+                this.addToWallet('expense', amount, '商户消费', '模拟消费');
+                this.showToast('支付成功');
+            } else if (method === 'qinmi') {
+                if ((source.limit - source.balanceUsed) < amount) return this.showToast('额度不足');
+                source.balanceUsed = (parseFloat(source.balanceUsed) + parseFloat(amount)).toFixed(2);
+                source.history.unshift({ item: '模拟消费', amount: amount, time: Date.now() });
+                this.showToast(`亲密付支付成功 (-${amount})`);
+            }
+            this.paymentSelectModal.show = false;
+            this.saveData();
+        },
+        handleAiIntimatePayConsumption(session) {
+             if(!this.wallet.intimatePays) return;
+             // AI uses MY money (Outcome)
+             const pay = this.wallet.intimatePays.find(p => p.targetId === session.targetId && p.type === 'outcome' && p.status === 'active');
+             if(pay) {
+                 if(Math.random() < 0.3) { // 30% chance per message interaction
+                     const items = ['奶茶', '游戏皮肤', '电影票', '打车', '网购零食', '超市便利店'];
+                     const item = items[Math.floor(Math.random()*items.length)];
+                     const cost = (Math.random() * 50 + 10).toFixed(2);
+                     
+                     if (parseFloat(pay.balanceUsed) + parseFloat(cost) <= parseFloat(pay.limit)) {
+                         if (this.wallet.balance >= cost) {
+                             pay.balanceUsed = (parseFloat(pay.balanceUsed) + parseFloat(cost)).toFixed(2);
+                             pay.history.unshift({ item, amount: cost, time: Date.now() });
+                             this.addToWallet('expense', cost, session.name, `亲密付-${item}`);
+                         }
+                     }
+                 }
+             }
+        },
+
+        // Moments Logic
+        openPublishMoment() { this.showPublishMoment = true; this.newMoment = { content: '', images: [] }; },
+        async handleMomentImgUpload(e) {
+            const files = e.target.files; if(!files.length) return;
+            for(let i=0; i<files.length; i++) {
+                try {
+                    const url = await compressImage(files[i], 600);
+                    if(this.newMoment.images.length < 9) this.newMoment.images.push(url);
+                } catch(e){}
+            }
+            e.target.value = '';
+        },
+        publishMoment() {
+            if(!this.newMoment.content && this.newMoment.images.length === 0) return;
+            const moment = {
+                id: Date.now().toString(),
+                name: this.homeProfile.name,
+                avatar: this.homeProfile.avatar,
+                content: this.newMoment.content,
+                images: this.newMoment.images,
+                time: Date.now(),
+                likes: [],
+                comments: [],
+                isLiked: false
+            };
+            this.moments.unshift(moment);
+            this.showPublishMoment = false;
+            this.saveData();
+            this.showToast('发表成功');
+        },
+        toggleLike(moment) {
+            moment.isLiked = !moment.isLiked;
+            if(moment.isLiked) moment.likes.push(this.homeProfile.name);
+            else {
+                const idx = moment.likes.indexOf(this.homeProfile.name);
+                if(idx > -1) moment.likes.splice(idx, 1);
+            }
+            this.saveData();
+        },
+
+        getFriendAvatar(tid) {
+             const f = this.wechatState.friendList.find(x => x.id === tid);
+             return f ? f.avatar : '';
+        },
+        getFriendName(tid) {
+            const f = this.wechatState.friendList.find(x=>x.id===tid);
+            return f ? (f.remark||f.name) : '未知好友';
+        }
     }
 }).mount('#app');
 </script>
