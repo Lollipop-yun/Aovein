@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aovein</title>
+    <title>Aovein OS - Ultimate v24 (AI Music Sense)</title>
     <!-- 依赖库 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -136,43 +135,23 @@
         }
 
         /* ---------------- 特殊卡片样式 (强制样式保护) ---------------- */
-        
-        /* 1. 朋友圈转发卡片 - 强制白底黑字 */
         .chat-bubble-moment { 
             background-color: #ffffff !important; 
             color: #333 !important; 
-            padding: 12px; 
-            width: 240px; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            padding: 12px; width: 240px; cursor: pointer; border-radius: 12px; 
+            display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.05);
         }
-        
-        /* 2. 聊天记录转发卡片 - 强制白底黑字 */
         .forward-card { 
             background-color: #ffffff !important; 
             color: #333 !important; 
-            border: 1px solid #eee; 
-            border-radius: 12px; 
-            padding: 12px; 
-            width: 220px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 6px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+            border: 1px solid #eee; border-radius: 12px; padding: 12px; 
+            width: 220px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
         }
-
-        /* 3. 红包与转账 - 强制颜色 */
         .chat-bubble-finance { padding: 0; overflow: hidden; color: white; width: 230px; display: flex; flex-direction: column; cursor: pointer; }
         .chat-bubble-transfer { background: #fa9d3b !important; }
         .chat-bubble-transfer.received { background: #f7bb79 !important; opacity: 0.9; } 
         .chat-bubble-redpacket { background: #ea5f39 !important; }
         
-        /* --------------------------------------------------------- */
-
         .finance-content { padding: 15px; display: flex; align-items: center; gap: 12px; }
         .finance-icon-box { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fa9d3b; font-size: 20px; }
         .chat-bubble-redpacket .finance-icon-box { color: #ea5f39; background: #fce8cd; }
@@ -292,6 +271,44 @@
         .moment-comment-input-box { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
         .moment-input { flex: 1; border: 1px solid #ddd; border-radius: 4px; padding: 4px 8px; font-size: 13px; outline: none; }
 
+        /* 音乐播放器界面样式 */
+        .music-player-overlay { position: fixed; inset: 0; background-color: #333; z-index: 60000; color: white; display: flex; flex-direction: column; overflow: hidden; }
+        .music-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; padding-top: 50px; }
+        .music-disc-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; flex-direction: column; }
+        
+        /* 双头像 (上移到 Top 8%) */
+        .avatar-connector { position: absolute; top: 8%; width: 140px; height: 60px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .music-avatar-small { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: #ddd; }
+        
+        /* 黑胶唱片 (位置调整，默认灰色) */
+        .music-disc { width: 220px; height: 220px; border-radius: 50%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; border: 8px solid rgba(255,255,255,0.1); box-shadow: 0 0 40px rgba(0,0,0,0.5); position: relative; margin-top: 60px; cursor: pointer; }
+        .music-disc-inner { width: 150px; height: 150px; border-radius: 50%; background: #333; overflow: hidden; } /* 默认深灰 */
+        
+        /* 歌词视图 */
+        .lyric-view { flex: 1; width: 100%; overflow-y: scroll; padding: 20px 40px; text-align: center; mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); margin-top: 60px; cursor: pointer; }
+        .lyric-line { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 16px; transition: all 0.3s; }
+        .lyric-line.active { font-size: 16px; color: #fff; font-weight: bold; transform: scale(1.05); }
+        .lyric-placeholder { color: rgba(255,255,255,0.3); font-size: 14px; margin-top: 100px; }
+        
+        /* 播放进度 */
+        .music-controls { padding: 20px 20px 60px 20px; display: flex; flex-direction: column; gap: 20px; }
+        .music-slider { -webkit-appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.2); outline: none; border-radius: 2px; }
+        .music-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; cursor: pointer; }
+        .music-time { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+        .music-buttons { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .animate-spin-slow { animation: spin 10s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* 音乐管理界面 */
+        .music-list-screen { position: fixed; bottom: 0; left: 0; width: 100%; height: 50vh; background-color: #f7f7f7; z-index: 60001; display: flex; flex-direction: column; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); animation: slideUp 0.3s ease-out; }
+        .music-list-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60000; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* 灵动岛 */
+        .dynamic-island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); height: 35px; background: black; border-radius: 20px; display: flex; align-items: center; padding: 0 4px; gap: 8px; z-index: 50000; color: white; font-size: 12px; transition: all 0.3s; max-width: 60%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; overflow: hidden; }
+        .island-art { width: 27px; height: 27px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #333; margin-left: 2px; }
+        .island-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px; flex: 1; text-align: center; font-weight: 500; font-size: 11px; }
+
     </style>
     
     <!-- 动态美化样式 -->
@@ -385,6 +402,205 @@
                 </div>
             </div>
             <input type="file" ref="avatarSettingInput" accept="image/*" class="hidden" @change="handleAvatarUpload">
+        </div>
+    </transition>
+
+    <!-- 一起听音乐界面 (Music Player) -->
+    <transition name="app-slide">
+        <div v-if="musicModal.show" class="music-player-overlay">
+            <div class="music-header">
+                <button @click="minimizeMusic" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-down text-xl"></i></button>
+                <div class="flex flex-col items-center">
+                    <span class="text-base font-bold">{{ musicModal.songTitle || '---' }}</span>
+                    <span class="text-xs text-gray-400">{{ musicModal.artist || '---' }}</span>
+                </div>
+                <div class="flex items-center gap-4">
+                     <button @click="stopListenTogether" class="text-gray-400 hover:text-white"><i class="fas fa-power-off text-lg"></i></button>
+                     <button @click="openMusicManager" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-ellipsis-h text-xl"></i></button>
+                </div>
+            </div>
+            
+            <div class="music-disc-container">
+                <!-- 双头像展示 (仅在非歌词模式显示) -->
+                <div v-if="!musicModal.showLyrics" class="avatar-connector">
+                    <div class="music-avatar-small"><img :src="getChatAvatar({isSelf: true})" class="w-full h-full object-cover"></div>
+                    <div class="music-avatar-small"><img :src="getChatAvatar({isSelf: false, targetId: wechatState.activeSession?.targetId})" class="w-full h-full object-cover"></div>
+                </div>
+                <!-- 状态文字：点击修改 -->
+                <div v-if="!musicModal.showLyrics" class="text-xs text-gray-300 absolute top-[22%] cursor-pointer active:opacity-50" @click="editMusicStatusText">{{ musicModal.customStatusText || 'TA 就在你身边, 一起听了 1355 小时' }}</div>
+                
+                <!-- 歌词模式 -->
+                <div v-if="musicModal.showLyrics" class="lyric-view" ref="lyricContainer" @click="musicModal.showLyrics = false">
+                    <div v-if="musicModal.currentLyrics.length === 0" class="lyric-placeholder">纯音乐模式</div>
+                    <div v-else>
+                        <div class="h-32"></div>
+                        <div v-for="(line, idx) in musicModal.currentLyrics" :key="idx" 
+                             class="lyric-line" :class="{'active': idx === musicModal.activeLyricIndex}">
+                            {{ line.text }}
+                        </div>
+                        <div class="h-40"></div>
+                    </div>
+                </div>
+                
+                <!-- 唱片模式 -->
+                <div v-else class="music-disc" :class="musicModal.isPlaying ? 'animate-spin-slow' : ''" @click="toggleLyricView">
+                    <div class="music-disc-inner relative">
+                         <!-- 唱片纹理/封面 -->
+                         <img v-if="musicModal.coverUrl" :src="musicModal.coverUrl" class="w-full h-full object-cover">
+                         <img v-else :src="defaultMusicCover" class="w-full h-full object-cover opacity-80">
+                         <div v-if="!musicModal.coverUrl" class="absolute inset-0 bg-black/20"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="music-controls">
+                <div class="flex justify-between px-4 text-2xl text-gray-400">
+                    <i class="fas fa-heart text-red-500"></i>
+                    <i class="fas fa-download"></i>
+                    <i class="fas fa-comment-dots"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+                <div>
+                    <!-- 拖拽进度条 -->
+                    <input type="range" class="music-slider" min="0" :max="musicModal.durationSec || 0" v-model="musicModal.currentSec" @input="seekAudio">
+                    <div class="music-time"><span>{{ formatTime(musicModal.currentSec) }}</span><span>{{ formatTime(musicModal.durationSec) }}</span></div>
+                </div>
+                <div class="music-buttons">
+                    <!-- 播放模式切换: 列表(repeat), 单曲(redo-alt-1), 随机(random) -->
+                    <i class="fas text-gray-400 text-lg cursor-pointer" 
+                       :class="musicModal.playMode === 'random' ? 'fa-random text-white' : (musicModal.playMode === 'loop' ? 'fa-redo-alt relative' : 'fa-repeat text-white')" 
+                       @click="togglePlayMode">
+                       <span v-if="musicModal.playMode === 'loop'" class="absolute text-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-black">1</span>
+                    </i>
+                    
+                    <i class="fas fa-step-backward text-white text-2xl" @click="prevSong"></i>
+                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-black text-2xl cursor-pointer" @click="toggleMusicPlay">
+                        <i :class="musicModal.isPlaying ? 'fas fa-pause' : 'fas fa-play'"></i>
+                    </div>
+                    <i class="fas fa-step-forward text-white text-2xl" @click="nextSong"></i>
+                    
+                    <!-- 播放列表按钮 -->
+                    <i class="fas fa-list text-gray-400 text-lg cursor-pointer hover:text-white" @click="togglePlaylist"></i>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- 音乐管理界面 (全屏) & 播放列表 (半屏) -->
+    <transition name="app-slide">
+        <!-- 1. 全屏管理界面 (右上角三个点进入) -->
+        <div v-if="musicManager.show" class="fixed inset-0 z-[60001] bg-[#f7f7f7] flex flex-col">
+            <div class="h-[60px] pt-4 px-4 flex items-center justify-between bg-white border-b border-gray-100">
+                <button @click="closeMusicManager" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg"></i></button>
+                <h1 class="text-base font-bold">音乐库管理</h1>
+                <div class="flex gap-3 text-xs font-bold">
+                    <button @click="triggerLocalMusic">本地</button>
+                    <button @click="triggerUrlMusic">URL</button>
+                    <button @click="musicManager.isMulti = !musicManager.isMulti" :class="musicManager.isMulti ? 'text-red-500' : ''">多选</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 bg-white">
+                <div v-if="musicPlaylist.length === 0" class="text-center text-gray-400 mt-20 text-xs">暂无音乐，请添加</div>
+                <div v-for="(song, idx) in musicPlaylist" :key="song.id" class="flex flex-col border-b border-gray-50 py-3">
+                    <div class="flex items-center justify-between active:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center gap-3 overflow-hidden w-full">
+                            <div v-if="musicManager.isMulti" class="shrink-0" @click.stop="toggleSelectSong(song.id)">
+                                <div class="w-4 h-4 rounded-full border border-gray-300" :class="musicManager.selectedIds.includes(song.id) ? 'bg-black border-black' : ''"></div>
+                            </div>
+                            <div class="w-10 h-10 rounded bg-gray-100 overflow-hidden shrink-0">
+                                <img v-if="song.cover" :src="song.cover" class="w-full h-full object-cover">
+                                <div v-else class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500"><i class="fas fa-compact-disc"></i></div>
+                            </div>
+                            <div class="flex flex-col min-w-0 flex-1">
+                                <div class="text-sm font-bold truncate">{{ song.title }}</div>
+                                <div class="text-xs text-gray-400 truncate">{{ song.artist }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 管理按钮区 -->
+                    <div class="flex gap-2 mt-2 pl-13 justify-between items-center">
+                        <div class="flex gap-2">
+                             <button @click.stop="triggerCoverUpload(song)" class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600">专辑</button>
+                             <button @click.stop="editSongInfo(song)" class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600">歌曲</button>
+                             <button @click.stop="reuploadLyrics(song)" class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600">歌词</button>
+                        </div>
+                        <span class="text-[10px] text-gray-300">{{ song.playCount || 0 }} 次</span>
+                    </div>
+                </div>
+            </div>
+            <div v-if="musicManager.isMulti && musicManager.selectedIds.length > 0" class="p-4 bg-white border-t border-gray-100 flex justify-center pb-safe">
+                 <button @click="deleteSelectedSongs" class="text-red-500 font-bold text-sm">删除选中 ({{ musicManager.selectedIds.length }})</button>
+            </div>
+        </div>
+    </transition>
+    
+    <!-- 2. 半屏播放列表 (点击播放器右下角图标进入) -->
+    <transition name="app-slide">
+        <div v-if="musicModal.showPlaylist" class="fixed inset-0 z-[61000]">
+            <div class="absolute inset-0 bg-transparent" @click="musicModal.showPlaylist = false"></div>
+            <div class="music-list-screen">
+                 <div class="p-4 bg-white border-b border-gray-100 font-bold text-sm sticky top-0 flex justify-between">
+                     <span>播放列表 ({{ musicPlaylist.length }})</span>
+                     <span class="text-gray-400 font-normal text-xs" @click="togglePlayMode">{{ getPlayModeName() }}</span>
+                 </div>
+                 <div class="flex-1 overflow-y-auto bg-white p-4">
+                     <div v-if="musicPlaylist.length === 0" class="text-center text-gray-400 mt-10 text-xs">列表为空</div>
+                     <div v-for="song in musicPlaylist" :key="song.id" @click="playSong(song)" class="flex items-center justify-between py-3 border-b border-gray-50 active:bg-gray-50 cursor-pointer">
+                         <div class="flex items-center gap-3 overflow-hidden">
+                             <div class="text-sm font-bold truncate" :class="musicModal.currentId === song.id ? 'text-red-500' : 'text-gray-900'">{{ song.title }}</div>
+                             <div class="text-xs text-gray-400 truncate">- {{ song.artist }}</div>
+                         </div>
+                         <i v-if="musicModal.currentId === song.id" class="fas fa-volume-up text-red-500 text-xs"></i>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </transition>
+    
+    <!-- 灵动岛 (Dynamic Island) -->
+    <transition name="scale">
+        <div v-if="musicModal.isMinimized && musicModal.currentId" class="dynamic-island" @click="restoreMusicPlayer">
+            <div class="island-art">
+                <img :src="musicModal.coverUrl || defaultMusicCover" class="w-full h-full object-cover" :class="musicModal.isPlaying ? 'animate-spin-slow' : ''">
+            </div>
+            <div class="island-text">
+                {{ getCurrentLyricText() || musicModal.songTitle }}
+            </div>
+            <div class="w-4 flex justify-center">
+                 <i class="fas fa-signal text-[8px] animate-pulse"></i>
+            </div>
+        </div>
+    </transition>
+
+    <input type="file" ref="musicFileInput" accept="audio/*" class="hidden" @change="handleMusicFilePick">
+    <input type="file" ref="coverInput" accept="image/*" class="hidden" @change="handleCoverFilePick">
+
+    <!-- 添加音乐弹窗 -->
+    <transition name="scale">
+        <div v-if="addMusicModal.show" class="fixed inset-0 z-[65000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-white w-[85%] rounded-2xl overflow-hidden shadow-2xl p-5 flex flex-col gap-4">
+                <h3 class="text-lg font-bold text-center">{{ addMusicModal.mode === 'edit' ? '编辑信息' : '添加音乐信息' }}</h3>
+                <input v-model="addMusicModal.title" placeholder="歌名" class="bg-gray-50 p-2 rounded-lg text-sm border border-gray-200 outline-none">
+                <input v-model="addMusicModal.artist" placeholder="歌手 (选填)" class="bg-gray-50 p-2 rounded-lg text-sm border border-gray-200 outline-none">
+                
+                <div class="border-t border-gray-100 pt-2">
+                    <div class="text-xs font-bold text-gray-500 mb-2">歌词</div>
+                    <div class="flex gap-2 mb-2">
+                        <button @click="addMusicModal.lyricType='file'" class="flex-1 py-1 text-xs rounded border transition" :class="addMusicModal.lyricType==='file'?'bg-black text-white':'bg-white text-gray-500'">文件导入</button>
+                        <button @click="addMusicModal.lyricType='text'" class="flex-1 py-1 text-xs rounded border transition" :class="addMusicModal.lyricType==='text'?'bg-black text-white':'bg-white text-gray-500'">文本粘贴</button>
+                    </div>
+                    <div v-if="addMusicModal.lyricType==='file'">
+                        <button @click="triggerLrcPick" class="w-full py-2 bg-gray-100 rounded text-xs text-blue-500">{{ addMusicModal.lrcFile ? addMusicModal.lrcFile.name : '选择 .lrc 文件' }}</button>
+                        <input type="file" ref="lrcInput" accept=".lrc,.txt" class="hidden" @change="handleLrcFilePick">
+                    </div>
+                    <textarea v-else v-model="addMusicModal.lrcText" class="w-full h-20 bg-gray-50 p-2 text-xs rounded resize-none outline-none" placeholder="[00:00.00] 歌词内容..."></textarea>
+                </div>
+
+                <div class="flex gap-2">
+                    <button @click="addMusicModal.show=false" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold">取消</button>
+                    <button @click="confirmMusicInfo" class="flex-1 py-2 bg-black text-white rounded-lg text-sm font-bold">保存</button>
+                </div>
+            </div>
         </div>
     </transition>
 
@@ -1035,17 +1251,17 @@
                                 </div>
                                 <div class="moment-action-btn bg-[#f7f7f7] rounded text-[#576b95] cursor-pointer" @click.stop="toggleMomentMenu(moment)">
                                     <i class="fas fa-ellipsis-h text-sm"></i>
+                                    <!-- Popover Menu (Right Aligned) -->
+                                    <transition name="scale">
+                                        <div v-if="activeMomentMenuId === moment.id" class="moment-menu" @click.stop>
+                                            <div class="moment-menu-item" @click="handleMomentAction('like', moment)"><i class="far fa-heart"></i><span>{{ moment.isLiked ? '取消' : '赞' }}</span></div>
+                                            <div class="moment-menu-item" @click="handleMomentAction('comment', moment)"><i class="far fa-comment"></i><span>评论</span></div>
+                                            <div class="moment-menu-item" @click="handleMomentAction('forward', moment)"><i class="fas fa-share"></i><span>转发</span></div>
+                                            <div v-if="moment.name === homeProfile.name" class="moment-menu-item" @click="handleMomentAction('generate', moment)"><i class="fas fa-magic"></i><span>生成</span></div>
+                                            <div class="moment-menu-item text-red-400" @click="handleMomentAction('delete', moment)"><i class="far fa-trash-alt"></i><span>删除</span></div>
+                                        </div>
+                                    </transition>
                                 </div>
-                                <!-- Popover Menu -->
-                                <transition name="scale">
-                                    <div v-if="activeMomentMenuId === moment.id" class="moment-menu" @click.stop>
-                                        <div class="moment-menu-item" @click="handleMomentAction('like', moment)"><i class="far fa-heart"></i><span>{{ moment.isLiked ? '取消' : '赞' }}</span></div>
-                                        <div class="moment-menu-item" @click="handleMomentAction('comment', moment)"><i class="far fa-comment"></i><span>评论</span></div>
-                                        <div class="moment-menu-item" @click="handleMomentAction('forward', moment)"><i class="fas fa-share"></i><span>转发</span></div>
-                                        <div v-if="moment.name === homeProfile.name" class="moment-menu-item" @click="handleMomentAction('generate', moment)"><i class="fas fa-magic"></i><span>生成</span></div>
-                                        <div class="moment-menu-item text-red-400" @click="handleMomentAction('delete', moment)"><i class="far fa-trash-alt"></i><span>删除</span></div>
-                                    </div>
-                                </transition>
                             </div>
                             
                             <div v-if="moment.likes.length > 0 || moment.comments.length > 0" class="moment-likes-comments">
@@ -1112,10 +1328,10 @@
                 <header class="h-[90px] pt-10 px-4 flex items-center justify-between bg-white/95 backdrop-blur border-b border-gray-100 z-30">
                     <button @click="wechatState.activeNav = 'chat'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg text-gray-800"></i></button>
                     <!-- 点击标题显示心声 -->
-                    <div class="flex flex-col items-center cursor-pointer active:opacity-50" @click="openStatusModal">
+                    <div class="flex flex-col items-center cursor-pointer active:opacity-50 absolute left-1/2 -translate-x-1/2" @click="openStatusModal">
                         <h1 class="font-medium text-[16px] text-gray-900 flex items-center gap-1">
                             <span v-if="isTyping">对方正在输入中<span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span></span>
-                            <span v-else>{{ wechatState.activeSession.name }}</span>
+                            <span v-else>{{ getCurrentChatTitle() }}</span>
                         </h1>
                         <span class="text-[10px] text-gray-300 tracking-wider">Only You.</span>
                     </div>
@@ -1254,7 +1470,7 @@
                             <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-gift text-gray-600"></i></div><span class="attach-label">礼物</span></div>
                             <div class="attach-item" @click="openTransferModal"><div class="attach-icon-box"><i class="fas fa-money-bill-wave text-gray-600"></i></div><span class="attach-label">转账</span></div>
                             <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-cube text-gray-600"></i></div><span class="attach-label">收藏</span></div>
-                            <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-music text-gray-600"></i></div><span class="attach-label">一起听</span></div>
+                            <div class="attach-item" @click="showMusicModal"><div class="attach-icon-box"><i class="fas fa-music text-gray-600"></i></div><span class="attach-label">一起听</span></div>
                             <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-book-open text-gray-600"></i></div><span class="attach-label">一起读</span></div>
                             <!-- 线下模式 (灰色咖啡杯) -->
                             <div class="attach-item" @click="showToast('功能开发中')"><div class="attach-icon-box"><i class="fas fa-coffee text-gray-600"></i></div><span class="attach-label">线下模式</span></div>
@@ -1323,10 +1539,14 @@
                     </div>
                     <!-- 聊天背景入口 -->
                     <div class="flex justify-between items-center cursor-pointer active:bg-gray-50 p-2 -mx-2 rounded-lg" @click="navigateToChatBgSettings"><span class="text-sm">设置当前聊天背景</span><div class="flex items-center gap-2"><span class="text-xs text-gray-400">{{ wechatState.activeSession.wallpaper ? '已设置' : '默认' }}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div></div>
-                    <div class="flex justify-between items-center"><span class="text-sm">消息免打扰</span><div class="w-10 h-6 bg-gray-200 rounded-full relative"><div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"></div></div></div>
+                    
+                    <!-- 时间感应开关 -->
+                    <div class="flex justify-between items-center"><span class="text-sm">时间感应</span><input type="checkbox" class="switch-checkbox" id="time-sense-toggle" v-model="wechatState.activeSession.enableTimeSense" @change="saveData"><label for="time-sense-toggle" class="switch-label"><div class="switch-button"></div></label></div>
+
                     <div class="flex justify-between items-center"><span class="text-sm">置顶聊天</span><input type="checkbox" class="switch-checkbox" id="pin-chat-toggle" :checked="wechatState.activeSession?.isPinned" @change="togglePin"><label for="pin-chat-toggle" class="switch-label"><div class="switch-button"></div></label></div>
                     <div class="flex justify-between items-center cursor-pointer active:opacity-50" @click="worldBinderModal.show = true"><div class="flex flex-col"><span class="text-sm">绑定世界书 (可多选)</span><span class="text-xs text-gray-400 mt-0.5">{{ getWorldbookStatus() }}</span></div><i class="fas fa-chevron-right text-gray-300 text-xs"></i></div>
-                    <button @click="clearChatHistory" class="w-full text-red-500 font-bold text-sm py-2">清空聊天记录</button>
+                    <button @click="confirmClearChatHistory" class="w-full text-red-500 font-bold text-sm py-2 text-center">清空聊天记录</button>
+                    <button @click="confirmDeleteFriend" class="w-full text-red-500 font-bold text-sm py-2 text-center border-t border-gray-100">删除好友</button>
                 </div>
                 </div>
             </div>
@@ -1648,6 +1868,8 @@ createApp({
                 currentTab: 'bubble', // 'bubble' or 'theme'
                 tempCode: ''
             },
+            
+            defaultMusicCover: 'https://pic1.imgdb.cn/item/69a6512fdcdb109d1d43e04c.png',
 
             previewFontFamily: '', 
             appList: Object.keys(DEFAULT_APPS), appCustomization: {}, tempIconUrls: {}, uploadingAppId: null,
@@ -1700,6 +1922,32 @@ createApp({
             qinmiSelectModal: { show: false },
             paymentSelectModal: { show: false, amount: 0 },
             activeQinmiDetail: null,
+
+            // Music System
+            musicModal: { 
+                show: false, 
+                songTitle: '---', 
+                artist: '---', 
+                duration: '00:00', 
+                current: '00:00', 
+                durationSec: 0,
+                currentSec: 0,
+                isPlaying: false, 
+                currentId: null,
+                coverUrl: '', // 专辑图片
+                showLyrics: false, // 歌词/唱片切换
+                currentLyrics: [], 
+                activeLyricIndex: -1,
+                playMode: 'loop', // loop (列表循环), single (单曲循环), random (随机播放)
+                showPlaylist: false, // 半屏播放列表
+                customStatusText: '', // 自定义状态文字
+                isMinimized: false // 灵动岛最小化状态
+            },
+            musicManager: { show: false, isMulti: false, selectedIds: [] },
+            musicPlaylist: [], 
+            addMusicModal: { show: false, mode: 'add', id: null, title: '', artist: '', url: '', lyricType: 'file', lrcText: '', lrcFile: null, cover: '' },
+            currentAudioObj: null,
+            tempEditingSong: null, // 临时存储正在编辑封面的歌曲对象
 
             // Moments
             moments: [],
@@ -1757,7 +2005,6 @@ createApp({
     mounted() { 
         this.initDevice();
         this.loadData();
-        // 初始应用样式
         this.updateDynamicStyles();
         
         this.imageUploadInput = document.createElement('input');
@@ -1803,7 +2050,6 @@ createApp({
         'beautifyConfig.activeBubbleCSS'() { this.updateDynamicStyles(); },
         'beautifyConfig.activeThemeCSS'() { this.updateDynamicStyles(); },
         'themesPage'(newVal) {
-            // 当进入美化页面时，清空临时代码框
             if(newVal === 'beautify') {
                 this.beautifyConfig.tempCode = '';
             }
@@ -1813,7 +2059,424 @@ createApp({
         }
     },
     methods: {
-        // 美化功能相关逻辑
+        // --- 核心聊天逻辑 ---
+        getCurrentChatTitle() {
+            if(!this.wechatState.activeSession) return '';
+            const friend = this.wechatState.friendList.find(f => f.id === this.wechatState.activeSession.targetId);
+            return friend ? (friend.remark || friend.name) : this.wechatState.activeSession.name;
+        },
+
+        // --- 音乐管理与播放逻辑 (完整实现) ---
+        showMusicModal() {
+            this.musicModal.show = true;
+            this.musicModal.isMinimized = false; // 打开全屏时取消最小化
+            this.wechatState.showAttachMenu = false;
+        },
+        openMusicManager() {
+            this.musicManager.show = true;
+            this.musicManager.isMulti = false;
+            this.musicManager.selectedIds = [];
+        },
+        closeMusicManager() {
+            this.musicManager.show = false;
+        },
+        triggerLocalMusic() {
+            this.$refs.musicFileInput.click();
+        },
+        triggerUrlMusic() {
+             this.addMusicModal = { show: true, mode: 'add', id: null, title: '', artist: '', url: '', lyricType: 'text', lrcText: '', lrcFile: null, cover: '' };
+        },
+        async handleMusicFilePick(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(f);
+                reader.onload = (ev) => {
+                    const url = ev.target.result;
+                    this.addMusicModal = { 
+                        show: true, 
+                        mode: 'add',
+                        id: null,
+                        title: f.name.replace(/\.[^/.]+$/, ""), 
+                        artist: '', 
+                        url: url, 
+                        lyricType: 'file', 
+                        lrcText: '', 
+                        lrcFile: null,
+                        cover: ''
+                    };
+                };
+            } catch(err) {
+                this.showToast('读取文件失败');
+            }
+            e.target.value = '';
+        },
+        triggerLrcPick() {
+            this.$refs.lrcInput.click();
+        },
+        handleLrcFilePick(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            this.addMusicModal.lrcFile = f;
+            const reader = new FileReader();
+            reader.readAsText(f);
+            reader.onload = (ev) => {
+                this.addMusicModal.lrcText = ev.target.result;
+            };
+            e.target.value = '';
+        },
+        
+        // 专辑封面上传
+        triggerCoverUpload(song) {
+            this.tempEditingSong = song;
+            this.$refs.coverInput.click();
+        },
+        async handleCoverFilePick(e) {
+            const f = e.target.files[0];
+            if (!f || !this.tempEditingSong) return;
+            try {
+                const url = await compressImage(f, 600);
+                this.tempEditingSong.cover = url;
+                
+                // 如果当前正在播放这首歌，实时更新封面
+                if (this.musicModal.currentId === this.tempEditingSong.id) {
+                    this.musicModal.coverUrl = url;
+                }
+                
+                this.saveData();
+                this.showToast('专辑封面已更新');
+            } catch (err) {}
+            this.tempEditingSong = null;
+            e.target.value = '';
+        },
+        
+        // 编辑歌曲信息
+        editSongInfo(song) {
+             this.addMusicModal = {
+                 show: true,
+                 mode: 'edit',
+                 id: song.id,
+                 title: song.title,
+                 artist: song.artist,
+                 url: song.url,
+                 lyricType: 'text',
+                 lrcText: song.lyrics || '',
+                 lrcFile: null,
+                 cover: song.cover || ''
+             };
+        },
+        
+        // 重新上传歌词
+        reuploadLyrics(song) {
+            this.editSongInfo(song);
+            this.showToast('请重新输入或导入歌词');
+        },
+
+        confirmMusicInfo() {
+            if (!this.addMusicModal.title) return this.showToast('请输入歌名');
+            
+            if (this.addMusicModal.mode === 'add') {
+                if (!this.addMusicModal.url) return this.showToast('音频数据丢失');
+                const newSong = {
+                    id: Date.now().toString(),
+                    title: this.addMusicModal.title,
+                    artist: this.addMusicModal.artist || '未知歌手',
+                    url: this.addMusicModal.url,
+                    lyrics: this.addMusicModal.lrcText,
+                    cover: '',
+                    playCount: 0
+                };
+                this.musicPlaylist.push(newSong);
+                this.showToast('添加成功');
+            } else {
+                // Edit mode
+                const idx = this.musicPlaylist.findIndex(s => s.id === this.addMusicModal.id);
+                if (idx !== -1) {
+                    this.musicPlaylist[idx].title = this.addMusicModal.title;
+                    this.musicPlaylist[idx].artist = this.addMusicModal.artist || '未知歌手';
+                    this.musicPlaylist[idx].lyrics = this.addMusicModal.lrcText;
+                    
+                    // Update current player info if matching
+                    if (this.musicModal.currentId === this.musicPlaylist[idx].id) {
+                         this.musicModal.songTitle = this.musicPlaylist[idx].title;
+                         this.musicModal.artist = this.musicPlaylist[idx].artist;
+                         this.parseLyrics(this.musicPlaylist[idx].lyrics);
+                    }
+                    this.showToast('修改成功');
+                }
+            }
+            this.saveData();
+            this.addMusicModal.show = false;
+        },
+
+        playSong(song) {
+            if (this.musicManager.isMulti) return; 
+            
+            if (this.currentAudioObj) {
+                this.currentAudioObj.pause();
+                this.currentAudioObj = null;
+            }
+            
+            song.playCount = (song.playCount || 0) + 1;
+            this.saveData();
+            
+            this.musicModal.currentId = song.id;
+            this.musicModal.songTitle = song.title;
+            this.musicModal.artist = song.artist;
+            this.musicModal.coverUrl = song.cover || '';
+            this.musicModal.isPlaying = true;
+            this.musicModal.current = '00:00';
+            this.musicModal.duration = '...';
+            this.musicModal.currentSec = 0;
+            this.musicModal.durationSec = 0;
+            this.musicModal.showLyrics = false;
+            
+            this.parseLyrics(song.lyrics);
+            
+            this.currentAudioObj = new Audio(song.url);
+            this.currentAudioObj.loop = (this.musicModal.playMode === 'single'); 
+            
+            this.currentAudioObj.play().catch(e => console.error("Play error", e));
+            
+            this.currentAudioObj.onloadedmetadata = () => {
+                this.musicModal.durationSec = this.currentAudioObj.duration;
+                this.musicModal.duration = this.formatTime(this.currentAudioObj.duration);
+            };
+            
+            this.currentAudioObj.onended = () => {
+                if (this.musicModal.playMode === 'single') {
+                    this.currentAudioObj.currentTime = 0;
+                    this.currentAudioObj.play();
+                } else {
+                    this.nextSong();
+                }
+            };
+            
+            this.currentAudioObj.ontimeupdate = () => {
+                 if (!this.currentAudioObj) return;
+                 const cur = this.currentAudioObj.currentTime;
+                 this.musicModal.currentSec = cur;
+                 this.musicModal.current = this.formatTime(cur);
+                 
+                 // Update Lyrics Highlight
+                 if (this.musicModal.currentLyrics.length > 0) {
+                     let activeIdx = -1;
+                     for (let i = 0; i < this.musicModal.currentLyrics.length; i++) {
+                         if (cur >= this.musicModal.currentLyrics[i].time) {
+                             activeIdx = i;
+                         } else {
+                             break;
+                         }
+                     }
+                     if (activeIdx !== this.musicModal.activeLyricIndex) {
+                         this.musicModal.activeLyricIndex = activeIdx;
+                         if(this.musicModal.showLyrics) this.scrollLyrics();
+                     }
+                 }
+            };
+        },
+        
+        seekAudio() {
+            if (this.currentAudioObj) {
+                this.currentAudioObj.currentTime = this.musicModal.currentSec;
+            }
+        },
+
+        parseLyrics(lrc) {
+            if (!lrc) {
+                this.musicModal.currentLyrics = [];
+                return;
+            }
+            const lines = lrc.split('\n');
+            const result = [];
+            const timeExp = /\[(\d{2}):(\d{2})(\.\d{2,3})?\]/;
+            
+            for (let line of lines) {
+                const match = timeExp.exec(line);
+                if (match) {
+                    const min = parseInt(match[1]);
+                    const sec = parseInt(match[2]);
+                    const ms = match[3] ? parseFloat(match[3]) : 0;
+                    const time = min * 60 + sec + ms;
+                    const text = line.replace(timeExp, '').trim();
+                    if (text) {
+                        result.push({ time, text });
+                    }
+                }
+            }
+            this.musicModal.currentLyrics = result;
+        },
+        
+        toggleLyricView() {
+            // 如果有歌词或者没有封面(防止黑屏无聊)，切换到歌词
+            if (this.musicModal.currentLyrics.length > 0 || !this.musicModal.coverUrl) {
+                this.musicModal.showLyrics = !this.musicModal.showLyrics;
+                if (this.musicModal.showLyrics) {
+                     this.$nextTick(this.scrollLyrics);
+                }
+            } else {
+                // 如果有封面没歌词，也允许切换查看“纯音乐模式”
+                this.musicModal.showLyrics = !this.musicModal.showLyrics;
+            }
+        },
+        
+        scrollLyrics() {
+             const container = this.$refs.lyricContainer;
+             if (!container || this.musicModal.activeLyricIndex === -1) return;
+             const lineHeight = 30; 
+             const targetScroll = this.musicModal.activeLyricIndex * lineHeight;
+             container.scrollTo({
+                 top: targetScroll,
+                 behavior: 'smooth'
+             });
+        },
+
+        toggleMusicPlay() {
+            if (this.currentAudioObj) {
+                if (this.currentAudioObj.paused) {
+                    this.currentAudioObj.play();
+                    this.musicModal.isPlaying = true;
+                } else {
+                    this.currentAudioObj.pause();
+                    this.musicModal.isPlaying = false;
+                }
+            } else if (this.musicPlaylist.length > 0) {
+                this.playSong(this.musicPlaylist[0]);
+            }
+        },
+        nextSong() {
+            if(this.musicPlaylist.length === 0) return;
+            const idx = this.musicPlaylist.findIndex(s => s.id === this.musicModal.currentId);
+            
+            let nextIdx = 0;
+            if (this.musicModal.playMode === 'random') {
+                nextIdx = Math.floor(Math.random() * this.musicPlaylist.length);
+            } else {
+                nextIdx = (idx + 1) % this.musicPlaylist.length;
+            }
+            this.playSong(this.musicPlaylist[nextIdx]);
+        },
+        prevSong() {
+            if(this.musicPlaylist.length === 0) return;
+            const idx = this.musicPlaylist.findIndex(s => s.id === this.musicModal.currentId);
+            let prevIdx = 0;
+             if (this.musicModal.playMode === 'random') {
+                prevIdx = Math.floor(Math.random() * this.musicPlaylist.length);
+            } else {
+                prevIdx = (idx - 1 + this.musicPlaylist.length) % this.musicPlaylist.length;
+            }
+            this.playSong(this.musicPlaylist[prevIdx]);
+        },
+        toggleSelectSong(id) {
+            const idx = this.musicManager.selectedIds.indexOf(id);
+            if(idx > -1) this.musicManager.selectedIds.splice(idx, 1);
+            else this.musicManager.selectedIds.push(id);
+        },
+        deleteSelectedSongs() {
+            this.showConfirm('确定删除选中的音乐？', () => {
+                this.musicPlaylist = this.musicPlaylist.filter(s => !this.musicManager.selectedIds.includes(s.id));
+                if (this.musicManager.selectedIds.includes(this.musicModal.currentId)) {
+                    if(this.currentAudioObj) {
+                        this.currentAudioObj.pause();
+                        this.currentAudioObj = null;
+                    }
+                    this.musicModal.isPlaying = false;
+                    this.musicModal.songTitle = '---';
+                    this.musicModal.artist = '---';
+                }
+                this.musicManager.selectedIds = [];
+                this.musicManager.isMulti = false;
+                this.saveData();
+                this.showToast('删除成功');
+            });
+        },
+        formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '00:00';
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        },
+        
+        togglePlayMode() {
+            if(this.musicModal.playMode === 'loop') this.musicModal.playMode = 'single';
+            else if(this.musicModal.playMode === 'single') this.musicModal.playMode = 'random';
+            else this.musicModal.playMode = 'loop';
+            
+            if(this.currentAudioObj) {
+                this.currentAudioObj.loop = (this.musicModal.playMode === 'single');
+            }
+        },
+        getPlayModeName() {
+            if(this.musicModal.playMode === 'loop') return '列表循环';
+            if(this.musicModal.playMode === 'single') return '单曲循环';
+            return '随机播放';
+        },
+        togglePlaylist() {
+            this.musicModal.showPlaylist = !this.musicModal.showPlaylist;
+        },
+        stopListenTogether() {
+             if(this.currentAudioObj) {
+                 this.currentAudioObj.pause();
+                 this.currentAudioObj = null;
+             }
+             this.musicModal.isPlaying = false;
+             this.musicModal.show = false;
+             this.musicModal.isMinimized = false; // 完全关闭，不显示灵动岛
+        },
+        minimizeMusic() {
+            this.musicModal.show = false;
+            // 只有在播放或有歌的时候才显示灵动岛
+            if(this.musicModal.currentId) {
+                this.musicModal.isMinimized = true;
+            }
+        },
+        restoreMusicPlayer() {
+            this.musicModal.show = true;
+            this.musicModal.isMinimized = false;
+        },
+        editMusicStatusText() {
+            this.showInput('修改一起听状态', this.musicModal.customStatusText || 'TA 就在你身边, 一起听了 1355 小时', '', (val) => {
+                this.musicModal.customStatusText = val;
+                this.saveData();
+            });
+        },
+        getCurrentLyricText() {
+            if(this.musicModal.currentLyrics.length > 0 && this.musicModal.activeLyricIndex >= 0) {
+                return this.musicModal.currentLyrics[this.musicModal.activeLyricIndex].text;
+            }
+            return '';
+        },
+
+        // --- 好友删除与清空记录逻辑 ---
+        confirmDeleteFriend() {
+            this.showConfirm('删除好友将同时删除聊天记录，且不可恢复。确定删除？', this.deleteFriendAction);
+        },
+        deleteFriendAction() {
+            if (!this.wechatState.activeSession) return;
+            const sid = this.wechatState.activeSession.id;
+            const tid = this.wechatState.activeSession.targetId;
+            this.wechatState.sessions = this.wechatState.sessions.filter(s => s.id !== sid);
+            this.wechatState.friendList = this.wechatState.friendList.filter(f => f.id !== tid);
+            this.wechatState.activeSession = null;
+            this.wechatState.activeNav = 'chat';
+            this.saveData();
+            this.showToast('好友已删除');
+        },
+        confirmClearChatHistory() {
+             this.showConfirm('确定清空聊天记录吗？', this.clearChatHistoryAction);
+        },
+        clearChatHistoryAction() {
+            if (this.wechatState.activeSession) {
+                this.wechatState.activeSession.messages = [];
+                this.wechatState.activeSession.lastMessage = '';
+                this.saveData();
+                this.showToast('聊天记录已清空');
+            }
+        },
+        clearChatHistory() { this.confirmClearChatHistory(); }, 
+
+        // --- 美化功能相关逻辑 ---
         updateDynamicStyles() {
             const styleTag = document.getElementById('dynamic-beautify-style');
             if (styleTag) {
@@ -1948,6 +2611,8 @@ createApp({
                 this.statusModal.show = false;
                 this.favoritesModal.show = false;
                 this.qinmiSelectModal.show = false;
+                this.musicModal.show = false;
+                this.musicManager.show = false;
             }, 300); 
         },
         navigateSettings(t) { if (t === 'back') { if (this.settingsPage === 'main') this.closeApp(); else this.settingsPage = 'main'; } else { this.settingsPage = t; } },
@@ -2069,7 +2734,6 @@ createApp({
             folderIds = [...new Set(folderIds)];
 
             if (folderIds.length > 0) {
-                // Filter files: must be file type, in bound folder, AND isActive is true (or undefined)
                 const files = this.worldData.filter(i => i.type === 'file' && folderIds.includes(i.parentId) && i.isActive !== false);
                 if (files.length > 0) {
                     worldContext = "\n[World Info]:\n" + files.map(f => `(${f.name}): ${f.content}`).join("\n");
@@ -2078,6 +2742,30 @@ createApp({
             
             const recentMoments = this.moments.slice(0, 5).map(m => `[Moment by ${m.name}]: ${m.content}`).join("\n");
             const momentContext = recentMoments ? `\n[Recent Social Media Moments]:\n${recentMoments}\n` : "";
+            
+            // Time Sense Logic
+            let timeContext = "";
+            if (session.enableTimeSense) {
+                const hour = new Date().getHours();
+                let timePeriod = "";
+                let suggestedAction = "";
+                if (hour >= 5 && hour < 11) { timePeriod = "Morning"; suggestedAction = "Ask about breakfast."; } 
+                else if (hour >= 11 && hour < 14) { timePeriod = "Noon"; suggestedAction = "Ask about lunch."; } 
+                else if (hour >= 14 && hour < 18) { timePeriod = "Afternoon"; suggestedAction = "Maybe tea time."; } 
+                else if (hour >= 18 && hour < 22) { timePeriod = "Evening"; suggestedAction = "Ask about dinner."; } 
+                else { timePeriod = "Late Night"; suggestedAction = "Tell user to sleep."; }
+                timeContext = `\n[Real World Time]: ${hour}:00 (${timePeriod}). ${suggestedAction} Please incorporate this time context naturally.`;
+            }
+            
+            // Music Sense Logic (NEW)
+            let musicContext = "";
+            if (this.musicModal.isPlaying && this.musicModal.currentId) {
+                const playingSong = this.musicPlaylist.find(s => s.id === this.musicModal.currentId);
+                const currentLyric = this.getCurrentLyricText();
+                if (playingSong) {
+                    musicContext = `\n[Music Player]: User is currently listening to "${playingSong.title}" by ${playingSong.artist}. Current Lyric displayed: "${currentLyric}". You can react to the music or lyrics.`;
+                }
+            }
 
             let contextMessages = [];
             let systemPrompt = `Roleplay Game. 
@@ -2085,6 +2773,8 @@ createApp({
             User: ${mask.name}. Bio: ${mask.bio}. 
             ${worldContext}
             ${momentContext}
+            ${timeContext}
+            ${musicContext}
             
             IMPORTANT: You must output ONLY a valid JSON object. No Markdown. No other text.
             Structure:
@@ -2097,7 +2787,8 @@ createApp({
               "fake_image": "OPTIONAL: description of a photo you want to send",
               "red_packet": { "amount": "8.88", "note": "Happy Day" },
               "transfer": { "amount": "52.00", "note": "For you" },
-              "qinmi_reply": "accept" OR "reject" (Optional, use only if responding to Intimate Pay request)
+              "qinmi_reply": "accept" OR "reject" (Optional),
+              "music_control": "next" OR "prev" OR "stop" (Optional, use only if user asks to change music)
             }
             "reply" is an array of strings. Split long text into natural short messages.`;
             
@@ -2182,6 +2873,13 @@ createApp({
                     const tfMsg = { type: 'transfer', amount: amount, note: note, isSelf: false, time: Date.now(), avatar: session.avatar };
                     session.messages.push(tfMsg); session.lastMessage = '[微信转账]';
                 }
+                
+                // AI Music Control Logic
+                if (parsed.music_control) {
+                    if (parsed.music_control === 'stop') this.stopListenTogether();
+                    else if (parsed.music_control === 'next') this.nextSong();
+                    else if (parsed.music_control === 'prev') this.prevSong();
+                }
 
                 this.isTyping = false; 
                 this.handleAiIntimatePayConsumption(session);
@@ -2212,11 +2910,9 @@ createApp({
                          session.messages.push(aiMsg);
                          this.scrollToBottom();
                          
-                         // 最后一条消息更新会话列表预览
                          if (index === segments.length - 1) {
                              session.lastMessage = msgType === 'voice' ? '[语音]' : seg.trim();
                              
-                             // 随机撤回逻辑
                              if (Math.random() < 0.1) {
                                  setTimeout(() => {
                                      const targetIdx = session.messages.indexOf(aiMsg);
@@ -2231,7 +2927,6 @@ createApp({
                          
                          if(this.notificationConfig.currentSound) new Audio(this.notificationConfig.currentSound).play();
                          
-                         // 聊天内容触发 AI 发朋友圈 (概率)
                          if (Math.random() < 0.2) {
                              setTimeout(() => {
                                  this.generateAIMomentFromChat(session, seg);
@@ -2247,7 +2942,6 @@ createApp({
             }
         },
         
-        // 撤回弹窗只显示内容
         viewRecalled(msg) { this.showConfirm(msg.content, null); },
         
         showGlobalNotification(session, content) {
@@ -2308,8 +3002,6 @@ createApp({
             this.statusHistoryModal.show = true; 
         },
         togglePin() { if (this.wechatState.activeSession) { this.wechatState.activeSession.isPinned = !this.wechatState.activeSession.isPinned; this.saveData(); } },
-        
-        // 世界书相关
         bindWorldFolder(folderId) {
             const session = this.wechatState.activeSession;
             if (!session) return;
@@ -2403,13 +3095,7 @@ createApp({
         getFolderName(id) { if(!id) return '未归类'; const f=this.folders.find(x=>x.id===id); return f?f.name:'未归类'; },
         selectWorldFolder(id) { this.worldModal.parentId = id; this.folderSelectModal.show = false; },
         saveFileContent() { this.saveData(); this.showToast('已保存'); },
-        
-        // 世界书开关逻辑
-        toggleFileActive(file) {
-            file.isActive = file.isActive === false ? true : false;
-            this.saveData();
-        },
-
+        toggleFileActive(file) { file.isActive = file.isActive === false ? true : false; this.saveData(); },
         handleAppClick(id) { if(id==='themes'||id==='worldbook'||id==='settings'||id==='wechat')this.openApp(id); else this.showToast('仅作为展示'); },
         getAppName(id) { return (this.appCustomization[id] && this.appCustomization[id].name) ? this.appCustomization[id].name : DEFAULT_APPS[id].name; },
         hasCustomIcon(id) { return this.appCustomization[id] && this.appCustomization[id].icon; },
@@ -3277,10 +3963,8 @@ createApp({
                      this.generateAIReplyToComment(moment, aiFriend, this.commentInput);
                  }
             } else {
-                // 如果是回复动态，查找作者是否为 AI
                 const aiAuthor = this.wechatState.friendList.find(f => (f.remark || f.name) === moment.name);
                 if (aiAuthor) {
-                    // 确保触发回复逻辑
                     this.generateAIReplyToComment(moment, aiAuthor, this.commentInput, true); 
                 }
             }
@@ -3565,4 +4249,4 @@ createApp({
 }).mount('#app');
 </script>
 </body>
-</html>
+</html>        
