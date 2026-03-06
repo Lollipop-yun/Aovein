@@ -129,7 +129,12 @@
         }
         .fake-image-text { 
             padding: 15px; font-size: 13px; text-align: center; color: #374151; font-weight: 500;
-            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%;
+            /* Modified for scrolling support as requested */
+            display: block !important; 
+            overflow-y: auto !important; 
+            word-break: break-word;
+            
             background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
             animation: fadeIn 0.3s ease;
         }
@@ -2125,7 +2130,7 @@
             </div>
 
             <!-- 朋友圈 (Moments) -->
-            <div v-if="wechatState.activeNav === 'moments'" class="flex-1 flex flex-col bg-white absolute inset-0 z-50 overflow-y-auto" @click="activeMomentMenuId = null">
+            <div v-if="wechatState.activeNav === 'moments'" class="flex-1 flex flex-col bg-white absolute inset-0 z-50 overflow-y-auto pb-32 moments-scroll-fix" @click="activeMomentMenuId = null" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
                 <div class="absolute top-0 left-0 w-full h-[90px] pt-10 px-4 flex justify-between items-center z-10 text-white drop-shadow-md">
                     <button @click="wechatState.activeNav='discover'" class="w-8 h-8 flex items-center justify-center"><i class="fas fa-chevron-left text-lg"></i></button>
                     <div class="flex gap-4">
@@ -2145,7 +2150,7 @@
                 <!-- 隐藏的封面上传 -->
                 <input type="file" ref="momentsCoverInput" accept="image/*" class="hidden" @change="handleMomentsCoverUpload">
 
-                <div class="pb-20">
+                <div class="pb-20 min-h-[101%]">
                     <div v-if="moments.length === 0" class="text-center text-gray-400 text-sm mt-10">暂无动态，点击右上角发布</div>
                     <div v-for="moment in moments" :key="moment.id" class="moment-item">
                         <div class="moment-avatar"><img :src="moment.avatar" class="w-full h-full object-cover"></div>
@@ -3103,11 +3108,13 @@ createApp({
             this.scrollToBottom();
             this.saveData();
             
-            // Trigger AI reply potentially
-            if (!this.wechatState.activeSession.isBlocked) {
-                setTimeout(() => {
-                    this.triggerReceive();
-                }, 1000);
+            // Trigger AI reply potentially - DISABLED as requested
+            if (false) {
+                if (!this.wechatState.activeSession.isBlocked) {
+                    setTimeout(() => {
+                        this.triggerReceive();
+                    }, 1000);
+                }
             }
         },
 
@@ -5758,4 +5765,4 @@ createApp({
 }).mount('#app');
 </script>
 </body>
-</html>                               
+</html>
